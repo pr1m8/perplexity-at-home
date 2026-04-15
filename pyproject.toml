@@ -2,18 +2,731 @@
 name = "perplexity-at-home"
 version = "0.1.0"
 description = "Default template for PDM package"
-authors = [
-    {name = "Will", email = "you@example.com"},
-]
-dependencies = []
-requires-python = ">=3.13"
 readme = "README.md"
-license = {text = "MIT"}
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "requests>=2.32.5",
+    "urllib3>=2.6.3",
+    "charset-normalizer>=3.4.4",
+    "neo4j>=6.1.0",
+    "alembic>=1.18.4",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+    "sqlalchemy[asyncio]>=2.0.49",
+    "fastapi>=0.135.3",
+    "uvicorn[standard]>=0.44.0",
+    "sse-starlette>=3.3.4",
+    "pyrate-limiter>=4.1.0",
+    "tenacity>=9.1.4",
+    "psycopg[binary,pool]",
+    "opentelemetry-api>=1.40.0",
+    "opentelemetry-sdk>=1.40.0",
+    "opentelemetry-exporter-otlp>=1.40.0",
+    "opentelemetry-instrumentation>=0.61b0",
+    "opentelemetry-instrumentation-fastapi>=0.61b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.61b0",
+    "opentelemetry-instrumentation-psycopg>=0.61b0",
+    "opentelemetry-instrumentation-logging>=0.61b0",
+    "prometheus-client>=0.24.1",
+    "temporalio[opentelemetry]>=1.24.0",
+    "minio>=7.2.20",
+    "fastmcp==3.0.2",
+]
+
+[[project.authors]]
+name = "Will"
+email = "you@example.com"
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/pr1m8/perplexity-at-home"
+Repository = "https://github.com/pr1m8/perplexity-at-home"
+Issues = "https://github.com/pr1m8/perplexity-at-home/issues"
+
+[project.optional-dependencies]
+# -------------------------
+# Platform / app stack
+# -------------------------
+app = [
+    "fastapi>=0.135.3",
+    "uvicorn[standard]>=0.44.0",
+    "sse-starlette>=3.3.4",
+    "pyrate-limiter>=4.1.0",
+    "tenacity>=9.1.4",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+]
+
+async = [
+    "anyio>=4.13.0",
+    "httpx>=0.28.1",
+    "redis>=7.4.0",
+    "aiofiles>=25.1.0",
+    "asgi-lifespan>=2.1.0",
+    "watchfiles>=1.1.1",
+]
+
+db = [
+    "sqlalchemy[asyncio]>=2.0.49",
+    "alembic>=1.18.4",
+    "psycopg[binary,pool]",
+]
+
+worker = [
+    "celery>=5.6.3",
+    "kombu>=5.6.2",
+]
+
+worker-redis = [
+    "arq>=0.25.0",
+]
+
+workflow = [
+    "temporalio[opentelemetry]>=1.24.0",
+]
+
+storage = [
+    "minio>=7.2.20",
+]
+
+storage-async = [
+    "aioboto3>=15.5.0",
+    "aiobotocore==2.25.1",
+]
+
+redis = [
+    "redis>=7.4.0",
+]
+
+logging = [
+    "rich>=14.3.3",
+    "structlog>=25.5.0",
+]
+
+observability = [
+    "opentelemetry-api>=1.40.0",
+    "opentelemetry-sdk>=1.40.0",
+    "opentelemetry-exporter-otlp>=1.40.0",
+    "opentelemetry-instrumentation>=0.61b0",
+    "opentelemetry-instrumentation-fastapi>=0.61b0",
+    "opentelemetry-instrumentation-asgi>=0.61b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.61b0",
+    "opentelemetry-instrumentation-psycopg>=0.61b0",
+    "opentelemetry-instrumentation-logging>=0.61b0",
+    "prometheus-client>=0.24.1",
+    "opentelemetry-instrumentation-redis>=0.61b0",
+    "opentelemetry-instrumentation-httpx>=0.61b0",
+    "opentelemetry-instrumentation-celery>=0.61b0",
+    "opentelemetry-instrumentation-system-metrics>=0.61b0",
+    "prometheus-fastapi-instrumentator>=7.1.0",
+]
+
+observability-extra = [
+    "opentelemetry-instrumentation-urllib3>=0.61b0",
+    "opentelemetry-instrumentation-aiohttp-client>=0.61b0",
+    "opentelemetry-instrumentation-botocore>=0.61b0",
+    "opentelemetry-instrumentation-grpc>=0.61b0",
+    "opentelemetry-instrumentation-pika>=0.61b0",
+    "opentelemetry-instrumentation-aio-pika>=0.61b0",
+    "opentelemetry-instrumentation-asyncpg>=0.61b0",
+]
+
+cli = [
+    "typer>=0.12.5,<0.22.0",
+    "rich>=14.3.3",
+]
+
+tui = [
+    "textual>=8.2.3",
+]
+
+perf = [
+    "msgspec>=0.20.0",
+]
+
+dashboard = [
+    "streamlit",
+    "pandas",
+    "pyarrow",
+    "plotly",
+    "duckdb",
+    "altair",
+    "streamlit-extras",
+    "folium",
+    "streamlit-folium",
+    "streamlit-aggrid",
+    "streamlit-echarts[pyecharts]",
+]
+
+# -------------------------
+# LangChain / agent / runtime core
+# -------------------------
+core = [
+    "langchain>=1.2.10",
+    "langchain-core>=1.2.17",
+    "langchain-community>=0.4.1",
+    "langchain-text-splitters>=1.1.1",
+    "langgraph>=1.0.10",
+    "langsmith>=0.7.11",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+    "tiktoken>=0.12.0",
+]
+
+runtime = [
+    "deepagents>=0.4.3",
+    "deepagents-acp>=0.0.4",
+    "langmem>=0.0.30",
+    "langgraph-checkpoint-postgres>=2.0.0",
+    "yfinance>=1.2.0",
+    "fredapi>=0.5.2",
+    "statsmodels>=0.14.6",
+    "arch>=8.0.0",
+    "pykalman>=0.11.2",
+    "hmmlearn>=0.3.3",
+    "ruptures>=1.1.10",
+    "hurst>=0.0.5",
+    "scikit-learn>=1.8.0",
+    "matplotlib>=3.10.0",
+    "seaborn>=0.13.0",
+    "httpx>=0.28.0",
+    "markdownify>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "sentence-transformers>=3.0.0",
+    "PyWavelets>=1.8.0",
+]
+
+runtime-http = [
+    "starlette>=0.52.1",
+    "uvicorn>=0.41.0",
+]
+
+langgraph-runtime = [
+    "langgraph-cli[inmem]>=0.4.14",
+    "langgraph-api>=0.7.62",
+    "langgraph-sdk>=0.3.9",
+    "langgraph-prebuilt>=1.0.8",
+    "langgraph-runtime-inmem>=0.26.0",
+    "langgraph-executor>=0.0.1a16",
+]
+
+langgraph-extras = [
+    "langgraph-supervisor>=0.0.31",
+    "langgraph-swarm>=0.1.0",
+    "langgraph-bigtool>=0.0.3",
+    "langmem>=0.0.30",
+]
+
+sandboxes = [
+    "langchain-sandbox>=0.0.3",
+    "deepagents>=0.4.3",
+    "deepagents-cli>=0.0.25",
+    "deepagents-acp>=0.0.4",
+    "langchain-daytona>=0.0.2",
+    "langchain-modal>=0.0.1",
+    "langchain-runloop>=0.0.2",
+]
+
+mcp = [
+    "mcp>=1.26.0",
+    "langchain-mcp-adapters>=0.2.1",
+    "langsmith-mcp-server>=0.1.1",
+    "mcpdoc>=0.0.10",
+    "o2mcp>=0.0.3",
+    "fastmcp==3.0.2",
+]
+
+hub = [
+    "streamlit>=1.40.0",
+    "httpx>=0.28.0",
+]
+
+jupyter = [
+    "jupyter>=1.0",
+    "notebook",
+    "jupyterlab",
+]
+
+# -------------------------
+# Providers / model backends
+# -------------------------
+providers-a = [
+    "langchain-openai>=1.1.10",
+    "langchain-anthropic>=1.3.4",
+    "langchain-google-genai>=4.2.1",
+    "langchain-google-vertexai>=3.2.2",
+    "langchain-google-community>=3.0.5",
+    "langchain-azure-ai>=1.0.0",
+    "langchain-mistralai>=1.1.1",
+    "langchain-ollama>=1.0.1",
+    "langchain-openrouter>=0.0.2",
+    "langchain-litellm>=0.6.1",
+]
+
+# `langchain-aws` is intentionally excluded from the main optional extras set:
+# its boto3 floor currently conflicts with `storage-async`'s aioboto3 pin, which
+# breaks `pdm install -G :all`.
+#
+# `langchain-groq` is also excluded from the optional extras set for now:
+# PDM 2.26.7 currently trips an AssertionError while resolving its transitive
+# metadata in this project on Python 3.13.
+#
+# `langchain-ibm` is also excluded for now:
+# its `ibm-watsonx-ai` transitive metadata currently sends PDM 2.26.7 into the
+# same AssertionError path during optional-group resolution on Python 3.13.
+
+providers-b = [
+    "databricks-langchain>=0.16.1",
+    "langchain-deepseek>=1.0.1",
+]
+
+hf-local = [
+    "langchain-huggingface>=1.2.1",
+    "huggingface-hub>=0.36.2",
+    "transformers>=4.57.6",
+    "datasets>=4.6.1",
+    "accelerate>=1.13.0",
+    "sentence-transformers>=5.2.3",
+    "sentencepiece>=0.2.1",
+    "safetensors>=0.7.0",
+    "tokenizers>=0.22.2",
+    "hf-transfer>=0.1.9",
+    "hf-xet>=1.3.2",
+    "peft>=0.18.1",
+]
+
+hf-local-bnb = [
+    'bitsandbytes>=0.49.2; sys_platform == "linux" and platform_machine == "x86_64"',
+]
+
+# -------------------------
+# Loaders / search / research
+# -------------------------
+loaders-docling = [
+    "langchain-docling>=2.0.0",
+    "docling>=2.76.0",
+]
+
+loaders-unstructured = [
+    "langchain-unstructured>=1.0.1",
+    "unstructured>=0.21.5",
+]
+
+loaders-pdf-advanced = [
+    "langchain-pymupdf4llm>=0.5.0",
+    "pymupdf4llm>=0.1.9",
+    "pdfplumber>=0.11.9",
+    "pdfminer-six>=20251230",
+    "pypdfium2>=5.5.0",
+]
+
+loaders-browser = [
+    "playwright>=1.58.0",
+    "selenium>=4.41.0",
+]
+
+loaders-web = [
+    "beautifulsoup4>=4.14.3",
+    "lxml>=6.0.2",
+    "trafilatura>=2.0.0",
+    "readability-lxml>=0.8.4.1",
+    "httpx>=0.28.1",
+    "aiohttp>=3.13.3",
+    "tldextract>=5.3.1",
+]
+
+loaders-firecrawl = [
+    "firecrawl-py>=4.18.0",
+]
+
+websearch = [
+    "langchain-tavily>=0.2.17",
+    "tavily-python>=0.7.22",
+    "langchain-exa>=1.0.0",
+    "exa-py>=1.16.1",
+    "duckduckgo-search>=8.1.1",
+    "langchain-google-community>=3.0.5",
+    "google-api-python-client>=2.191.0",
+    "google-search-results>=2.4.2",
+]
+
+research-scholarly = [
+    "arxiv>=2.4.0",
+    "pymupdf>=1.27.1",
+    "semanticscholar>=0.11.0",
+    "pyalex>=0.21",
+    "crossrefapi>=1.7.0",
+    "habanero>=2.3.0",
+    "scholarly>=1.7.11",
+    "wikipedia>=1.4.0",
+]
+
+web-crawl = [
+    "scrapy>=2.14.1",
+    "scrapy-playwright>=0.0.46",
+]
+
+retrieval-rerank = [
+    "flashrank>=0.2.10",
+]
+
+retrieval-bm25 = [
+    "rank-bm25>=0.2.2",
+    "nltk>=3.9.3",
+]
+
+# -------------------------
+# Databases / graph / vector
+# -------------------------
+neo4j-driver = [
+    "neo4j>=6.1.0",
+]
+
+neo4j = [
+    "langchain-neo4j>=0.8.0",
+    "langchain-experimental>=0.4.1",
+    "perplexity-at-home[neo4j-driver]",
+]
+
+# `neo4j-graphrag` is intentionally excluded from the optional extras set for
+# now: PDM 2.26.7 hits the same resolver AssertionError on its metadata during
+# broad `-G :all` installs under Python 3.13.
+
+vectordb-clients-a = [
+    "chromadb>=1.5.2",
+    "sqlalchemy>=2.0.48",
+    "asyncpg>=0.31.0",
+    "psycopg[binary]>=3.3.3",
+    "qdrant-client>=1.17.0",
+    "weaviate-client>=4.20.1",
+    "pymilvus>=2.6.9",
+    "pinecone>=8.1.0",
+    "elasticsearch>=9.3.0",
+    "pgvector<0.4,>=0.3.1",
+    "faiss-cpu>=1.13.2",
+    "hnswlib>=0.8.0",
+    "annoy>=1.17.3",
+    'scann>=1.4.2; platform_system == "Linux" and platform_machine == "x86_64"',
+]
+
+vectordb-clients-b = [
+    "redis>=7.2.1",
+    "pymongo>=4.16.0",
+    "astrapy>=2.1.0",
+    "couchbase>=4.5.0",
+    "snowflake-connector-python>=4.3.0",
+    "ibm-db>=3.2.8",
+    "pyodbc>=5.3.0",
+    "neo4j>=6.1.0",
+]
+
+# -------------------------
+# Quality / testing / ops
+# -------------------------
+dev = [
+    "pre-commit>=4.5.1",
+    "commitizen>=3.18.3",
+    "nox>=2026.2.9",
+    "tox>=4.27.0",
+]
+
+lint = [
+    "ruff>=0.15.4",
+    "pylint>=4.0.5",
+    "vulture>=2.14",
+    "radon>=6.0.1",
+    "xenon>=0.9.3",
+]
+
+typecheck = [
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+]
+
+typecov = [
+    "mypy>=1.19.1",
+    "interrogate>=1.7.0",
+]
+
+test = [
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.1.0",
+    "respx>=0.22.0",
+    "hypothesis>=6.151.11",
+    "pytest-xdist>=3.8.0",
+    "pytest-timeout>=2.4.0",
+    "pytest-rerunfailures>=16.1",
+    "syrupy>=5.1.0",
+    "pytest-mock>=3.15.1",
+    "typeguard>=4.5.1",
+    "pytest-sugar>=1.1.1",
+    "pytest-instafail>=0.5.0",
+    "pytest-clarity>=1.0.1",
+    "pytest-icdiff>=0.9",
+    "pytest-richer>=0.1.1",
+]
+
+report = [
+    "pytest-html>=4.2.0",
+    "diff-cover>=10.2.0",
+    "genbadge>=1.1.3",
+    "coverage-badge>=1.1.2",
+    "codecov>=2.1.13",
+    "coveralls>=4.1.0",
+    "pytest-html-plus>=0.5.0",
+    "pytest-md>=0.2.0",
+    "allure-pytest>=2.15.3",
+]
+
+coverage = [
+    "coverage>=7.13.4",
+]
+
+security = [
+    "bandit>=1.9.4",
+    "pip-audit>=2.10.0",
+    "detect-secrets>=1.5.0",
+    "safety>=3.7.0",
+]
+
+otel = [
+    "opentelemetry-distro[otlp]>=0.60b1",
+    "opentelemetry-instrumentation>=0.60b1",
+    "opentelemetry-api>=1.39.1",
+    "opentelemetry-sdk>=1.39.1",
+    "opentelemetry-semantic-conventions>=0.60b1",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.39.1",
+    "opentelemetry-exporter-otlp-proto-http>=1.39.1",
+    "opentelemetry-exporter-prometheus>=0.60b1",
+    "opentelemetry-instrumentation-logging>=0.60b1",
+    "opentelemetry-instrumentation-requests>=0.60b1",
+    "opentelemetry-instrumentation-httpx>=0.60b1",
+    "opentelemetry-instrumentation-urllib>=0.60b1",
+    "opentelemetry-instrumentation-urllib3>=0.60b1",
+    "opentelemetry-instrumentation-aiohttp-client>=0.60b1",
+    "opentelemetry-instrumentation-asgi>=0.60b1",
+    "opentelemetry-instrumentation-fastapi>=0.60b1",
+    "opentelemetry-instrumentation-starlette>=0.60b1",
+    "opentelemetry-instrumentation-wsgi>=0.60b1",
+    "opentelemetry-instrumentation-grpc>=0.60b1",
+    "opentelemetry-instrumentation-sqlalchemy>=0.60b1",
+    "opentelemetry-instrumentation-psycopg2>=0.60b1",
+    "opentelemetry-instrumentation-asyncpg>=0.60b1",
+    "opentelemetry-instrumentation-redis>=0.60b1",
+    "opentelemetry-instrumentation-pymongo>=0.60b1",
+    "opentelemetry-instrumentation-system-metrics>=0.60b1",
+    "opentelemetry-instrumentation-threading>=0.60b1",
+    "opentelemetry-instrumentation-click>=0.60b1",
+    "opentelemetry-resource-detector-containerid>=0.60b1",
+    "opentelemetry-exporter-richconsole>=0.60b1",
+    "opentelemetry-propagator-aws-xray>=1.0.2",
+    "opentelemetry-sdk-extension-aws>=2.1.0",
+    "opentelemetry-util-genai>=0.3b0",
+    "opentelemetry-instrumentation-openai-v2>=2.3b0",
+    "opentelemetry-instrumentation-openai-agents-v2>=0.1.0",
+    "opentelemetry-instrumentation-mcp>=0.52.6",
+    "opentelemetry-instrumentation-anthropic>=0.52.6",
+    "opentelemetry-instrumentation-vertexai>=0.52.6",
+    "opentelemetry-exporter-otlp>=1.39.1",
+]
+
+# Composite self-referential extras have been removed. They are redundant for
+# `pdm install -G :all` and make PDM resolve the project through nested extras
+# again, which significantly increases solver churn without adding new packages.
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src"]
+extend-exclude = [
+    ".venv",
+    ".nox",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "data",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["perplexity_at_home"]
+combine-as-imports = true
+force-sort-within-sections = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+include = ["src"]
+exclude = [".venv", "build", "dist", ".nox", ".pytest_cache"]
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = "warning"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+show_error_codes = true
+warn_unused_configs = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = [
+    "langchain.*",
+    "langgraph.*",
+    "chromadb.*",
+    "qdrant_client.*",
+    "weaviate.*",
+    "neo4j.*",
+    "playwright.*",
+    "scrapy.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-vv",
+    "--color=yes",
+    "--code-highlight=yes",
+    "--showlocals",
+    "--instafail",
+    "--cov=perplexity_at_home",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=xml:reports/coverage.xml",
+    "--cov-report=html:reports/htmlcov",
+    "--junitxml=reports/junit.xml",
+    "--html-output=reports/report_output",
+    "--json-report=reports/report_output/final_report.json",
+    "--should-open-report=never",
+    "--capture-screenshots=failed",
+]
+xfail_strict = true
+
+[tool.coverage.run]
+branch = true
+source = ["perplexity_at_home"]
+parallel = true
+
+[tool.coverage.report]
+fail_under = 85
+skip_covered = true
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.coverage.html]
+directory = "reports/htmlcov"
+
+[tool.coverage.xml]
+output = "reports/coverage.xml"
+
+[tool.interrogate]
+fail-under = 85
+verbose = 1
+color = true
+exclude = ["tests", "docs", "build", "dist", ".venv", ".nox"]
+
+[tool.bandit]
+exclude_dirs = ["tests", "docs", "build", "dist", ".venv", ".nox"]
+skips = ["B101"]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "v$version"
+version_scheme = "pep440"
+version_provider = "pep621"
+update_changelog_on_bump = true
+major_version_zero = true
+
+[tool.towncrier]
+package_dir = "."
+directory = "changes"
+filename = "RELEASE_NOTES.md"
+start_string = "<!-- towncrier release notes start -->\n"
+title_format = "## {version} - {project_date}"
+issue_format = "[#{issue}](https://github.com/pr1m8/perplexity-at-home/issues/{issue})"
+template = "default"
+underlines = ["", "", ""]
+all_bullets = false
+ignore = ["README.md", ".gitkeep"]
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "🚀 Features"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "🐛 Bug Fixes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "improvement"
+name = "✨ Improvements"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecation"
+name = "🗑️ Deprecations"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "breaking"
+name = "💥 Breaking Changes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "security"
+name = "🔒 Security"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "performance"
+name = "⚡ Performance"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "docs"
+name = "📚 Documentation"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "dev"
+name = "🔧 Development"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "misc"
+name = "🔀 Miscellaneous"
+showcontent = true
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.resolution.overrides]
+# Guard against a PDM 2.26.7 resolver bug on Python 3.13 by pinning the
+# transitive candidates that otherwise send `pdm install -G :all` down broken
+# metadata paths.
+greenlet = "==3.4.0"
+httptools = "==0.7.1"
+"python-dotenv" = "==1.2.2"
+pyyaml = "==6.0.3"
+uvloop = "==0.22.1"
+watchfiles = "==1.1.1"
+websockets = "==16.0"
 
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-
-[tool.pdm]
-distribution = true
