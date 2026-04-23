@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
 
 permissions: {}
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   live-e2e:
@@ -49,9 +51,11 @@ jobs:
 
       - name: Set up PDM
         uses: pdm-project/setup-pdm@v4
+        with:
+          version: 2.26.8
 
       - name: Install test dependencies
-        run: pdm install -G test
+        run: pdm sync -G test
 
       - name: Run live E2E suite
         run: pdm run pytest --no-cov -p no:rerunfailures -m e2e tests/test_live_e2e.py
