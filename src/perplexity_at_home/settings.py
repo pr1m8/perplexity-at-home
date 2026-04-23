@@ -8,7 +8,14 @@ from typing import Any, Literal
 from urllib.parse import quote_plus
 
 from langchain.chat_models.base import init_chat_model
-from pydantic import AliasChoices, BaseModel, Field, SecretStr, computed_field
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    Field,
+    SecretStr,
+    computed_field,
+    model_validator,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 type SSLMode = Literal[
@@ -112,6 +119,26 @@ class AppSettings(BaseSettings):
     deep_research_retrieval_model: str | None = None
     deep_research_reflection_model: str | None = None
     deep_research_answer_model: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_string_inputs(cls, values: Any) -> Any:
+        """Strip whitespace from string inputs and ignore blank env values."""
+        if not isinstance(values, dict):
+            return values
+
+        normalized: dict[str, Any] = {}
+        for key, value in values.items():
+            if isinstance(value, str):
+                stripped = value.strip()
+                if stripped == "":
+                    continue
+                normalized[key] = stripped
+                continue
+
+            normalized[key] = value
+
+        return normalized
 
     postgres_host_raw: str = Field(
         default="localhost",

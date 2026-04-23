@@ -50,10 +50,14 @@ def test_postgres_uri_escapes_credentials() -> None:
 def test_empty_env_values_are_ignored(monkeypatch) -> None:
     monkeypatch.setenv("POSTGRES_PORT", "")
     monkeypatch.setenv("PERPLEXITY_AT_HOME_POSTGRES__PORT", "")
+    monkeypatch.setenv("POSTGRES_DB", "   ")
+    monkeypatch.setenv("LANGGRAPH_STRICT_MSGPACK", "true ")
 
     settings = AppSettings(_env_file=None)
 
     assert settings.postgres.port == 5442
+    assert settings.postgres.database == "perplexity_at_home"
+    assert settings.langgraph_strict_msgpack is True
 
 
 def test_build_chat_model_uses_openai_key(monkeypatch) -> None:
