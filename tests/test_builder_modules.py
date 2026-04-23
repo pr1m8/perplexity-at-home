@@ -55,6 +55,30 @@ def test_quick_search_builder_uses_configured_model(monkeypatch) -> None:
     assert captured["tools"] == ["tool"]
 
 
+def test_quick_search_builder_accepts_shared_persistence(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    monkeypatch.setattr(
+        quick_search_agent,
+        "create_agent",
+        _capture_agent_kwargs(captured, "quick-agent"),
+    )
+    monkeypatch.setattr(quick_search_agent, "MemorySaver", DummyMemorySaver)
+    monkeypatch.setattr(quick_search_agent, "build_quick_bundle", lambda: {"search": "tool"})
+    monkeypatch.setattr(quick_search_agent, "get_settings", _default_settings)
+
+    result = quick_search_agent.build_quick_search_agent(
+        checkpointer="shared-ckpt",
+        store="shared-store",
+        debug=True,
+    )
+
+    assert result == "quick-agent"
+    assert captured["checkpointer"] == "shared-ckpt"
+    assert captured["store"] == "shared-store"
+    assert captured["debug"] is True
+
+
 def test_pro_search_builder_modules_pass_context(monkeypatch) -> None:
     for module, builder_name in [
         (pro_query_agent, "build_query_generator_agent"),

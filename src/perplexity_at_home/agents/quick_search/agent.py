@@ -26,6 +26,8 @@ Examples:
 
 from __future__ import annotations
 
+from typing import Any
+
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy
 from langgraph.checkpoint.memory import MemorySaver
@@ -38,7 +40,13 @@ from perplexity_at_home.settings import get_settings
 from perplexity_at_home.tools.tavily import build_quick_bundle
 
 
-def build_quick_search_agent(model: str | None = None) -> object:
+def build_quick_search_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> object:
     """Build the main quick-search agent.
 
     The resulting agent is configured for fast, citation-aware Tavily-backed
@@ -57,7 +65,7 @@ def build_quick_search_agent(model: str | None = None) -> object:
         >>> agent is not None
         True
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     tools = list(build_quick_bundle().values())
     settings = get_settings()
     resolved_model = settings.build_chat_model(
@@ -71,7 +79,9 @@ def build_quick_search_agent(model: str | None = None) -> object:
         system_prompt=build_quick_search_system_prompt(),
         context_schema=QuickSearchContext,
         state_schema=QuickSearchState,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(QuickSearchAnswer),
+        debug=debug,
         name="quick_search_agent",
     )

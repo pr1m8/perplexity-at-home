@@ -55,6 +55,10 @@ from perplexity_at_home.agents.pro_search.context import (
     ProSearchContextBase,
 )
 from perplexity_at_home.agents.pro_search.graph import build_pro_search_graph
+from perplexity_at_home.agents.pro_search.runtime import (
+    pro_search_agent_context,
+    run_pro_search,
+)
 from perplexity_at_home.agents.pro_search.state import (
     AggregatedResultRecord,
     ProSearchState,
@@ -72,4 +76,6 @@ __all__ = [
     "QueryExecutionRecord",
     "build_pro_search_agent",
     "build_pro_search_graph",
+    "pro_search_agent_context",
+    "run_pro_search",
 ]

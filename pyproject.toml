@@ -50,6 +50,7 @@ Documentation = "https://perplexity-at-home.readthedocs.io/"
 
 [project.scripts]
 perplexity-at-home = "perplexity_at_home.cli:main"
+perplexity-at-home-dashboard = "perplexity_at_home.dashboard.launcher:main"
 
 [project.optional-dependencies]
 # -------------------------

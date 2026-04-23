@@ -38,6 +38,7 @@ checkpointer together through `perplexity_at_home.core.persistence`.
 - `src/perplexity_at_home/agents/deep_research/`: graph, runtime, and child agents
 - `src/perplexity_at_home/agents/pro_search/`: faster research workflow
 - `src/perplexity_at_home/agents/quick_search/`: focused answer path for smaller tasks
+- `src/perplexity_at_home/dashboard/`: packaged Streamlit dashboard, launcher, and service layer
 - `examples/`: runnable demos kept close to the package surface
 
 ## Current testing shape

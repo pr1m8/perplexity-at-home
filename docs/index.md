@@ -9,8 +9,10 @@ builder for simpler question-answer flows.
 
 - Pydantic Settings for OpenAI, Tavily, LangSmith, and Postgres configuration
 - a packaged CLI entrypoint: `perplexity-at-home`
+- a packaged Streamlit launcher: `perplexity-at-home-dashboard`
 - optional Postgres-backed LangGraph persistence for checkpoints and store state
 - packaged builders for quick-search, pro-search, and deep-research graphs
+- a dashboard surface for switching between all three workflows
 - runnable demos under `examples/`
 - unit and integration coverage around settings, graph construction, persistence,
   and the CLI surface
