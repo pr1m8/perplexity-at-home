@@ -445,6 +445,7 @@ dev = [
     "commitizen>=3.18.3",
     "nox>=2026.2.9",
     "tox>=4.27.0",
+    "yamlfix>=1.19.1",
 ]
 
 lint = [

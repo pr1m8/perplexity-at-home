@@ -5,7 +5,7 @@
 groups = ["default", "app", "async", "cli", "core", "coverage", "dashboard", "db", "dev", "docs", "hf-local", "hf-local-bnb", "hub", "jupyter", "langgraph-extras", "langgraph-runtime", "lint", "loaders-browser", "loaders-docling", "loaders-firecrawl", "loaders-pdf-advanced", "loaders-unstructured", "loaders-web", "logging", "mcp", "neo4j", "neo4j-driver", "observability", "observability-extra", "otel", "perf", "providers-a", "providers-b", "redis", "report", "research-scholarly", "retrieval-bm25", "retrieval-rerank", "runtime", "runtime-http", "sandboxes", "security", "storage", "storage-async", "test", "tui", "typecheck", "typecov", "vectordb-clients-a", "vectordb-clients-b", "web-crawl", "websearch", "worker", "worker-redis", "workflow"]
 strategy = []
 lock_version = "4.5.0"
-content_hash = "sha256:f02e69e9ad470a09a64fc8554149667b8e4280fb848400a5237df4481f5fcbb6"
+content_hash = "sha256:d94577b9244db313b94124db6f3a7741e7771304bce7f1b1086e966ef09e3825"
 
 [[metadata.targets]]
 requires_python = ">=3.13,<3.14"
@@ -1573,7 +1573,7 @@ name = "cuda-bindings"
 version = "13.2.0"
 summary = ""
 dependencies = [
-    "cuda-pathfinder; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "cuda-pathfinder",
 ]
 files = [
     {file = "cuda_bindings-13.2.0-cp313-cp313-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:6629ca2df6f795b784752409bcaedbd22a7a651b74b56a165ebc0c9dcbd504d0"},
@@ -1603,7 +1603,7 @@ extras = ["cublas"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cublas; sys_platform == \"linux\"",
+    "nvidia-cublas; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1616,7 +1616,7 @@ extras = ["cudart"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cuda-runtime; sys_platform == \"linux\"",
+    "nvidia-cuda-runtime; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1629,7 +1629,7 @@ extras = ["cufft"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cufft; sys_platform == \"linux\"",
+    "nvidia-cufft; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1655,7 +1655,7 @@ extras = ["cupti"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cuda-cupti; sys_platform == \"linux\"",
+    "nvidia-cuda-cupti; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1668,7 +1668,7 @@ extras = ["curand"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-curand; sys_platform == \"linux\"",
+    "nvidia-curand; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1681,7 +1681,7 @@ extras = ["cusolver"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cusolver; sys_platform == \"linux\"",
+    "nvidia-cusolver; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1694,7 +1694,7 @@ extras = ["cusparse"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cusparse; sys_platform == \"linux\"",
+    "nvidia-cusparse; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1707,7 +1707,7 @@ extras = ["nvjitlink"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-nvjitlink; sys_platform == \"linux\"",
+    "nvidia-nvjitlink; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1720,7 +1720,7 @@ extras = ["nvrtc"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-cuda-nvrtc; sys_platform == \"linux\"",
+    "nvidia-cuda-nvrtc; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -1733,7 +1733,7 @@ extras = ["nvtx"]
 summary = ""
 dependencies = [
     "cuda-toolkit==13.0.2",
-    "nvidia-nvtx; sys_platform == \"linux\"",
+    "nvidia-nvtx; sys_platform == \"linux\" or sys_platform == \"win32\"",
 ]
 files = [
     {file = "cuda_toolkit-13.0.2-py2.py3-none-any.whl", hash = "sha256:b198824cf2f54003f50d64ada3a0f184b42ca0846c1c94192fa269ecd97a66eb"},
@@ -3476,7 +3476,7 @@ name = "gunicorn"
 version = "25.3.0"
 summary = ""
 dependencies = [
-    "packaging; sys_platform != \"win32\"",
+    "packaging",
 ]
 files = [
     {file = "gunicorn-25.3.0-py3-none-any.whl", hash = "sha256:cacea387dab08cd6776501621c295a904fe8e3b7aae9a1a3cbb26f4e7ed54660"},
@@ -5540,6 +5540,19 @@ files = [
 ]
 
 [[package]]
+name = "loguru"
+version = "0.7.3"
+summary = ""
+dependencies = [
+    "colorama; sys_platform == \"win32\"",
+    "win32-setctime; sys_platform == \"win32\"",
+]
+files = [
+    {file = "loguru-0.7.3-py3-none-any.whl", hash = "sha256:31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c"},
+    {file = "loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6"},
+]
+
+[[package]]
 name = "lxml"
 version = "6.1.0"
 summary = ""
@@ -5606,6 +5619,21 @@ files = [
     {file = "lxml-6.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:4a1503c56e4e2b38dc76f2f2da7bae69670c0f1933e27cfa34b2fa5876410b16"},
     {file = "lxml-6.1.0-cp313-cp313-win_arm64.whl", hash = "sha256:e0af85773850417d994d019741239b901b22c6680206f46a34766926e466141d"},
     {file = "lxml-6.1.0.tar.gz", hash = "sha256:bfd57d8008c4965709a919c3e9a98f76c2c7cb319086b3d26858250620023b13"},
+]
+
+[[package]]
+name = "maison"
+version = "2.0.2"
+summary = ""
+dependencies = [
+    "loguru",
+    "platformdirs",
+    "typer",
+    "typing-extensions",
+]
+files = [
+    {file = "maison-2.0.2-py3-none-any.whl", hash = "sha256:835de804aa8063795b48c4fe2b4918106cfda4e5df515e8784ec9fa64cd28191"},
+    {file = "maison-2.0.2.tar.gz", hash = "sha256:476f2bf414a20f5abf5a9856bd4db78b5a33c695654a0fc49c3c4abed78c2efc"},
 ]
 
 [[package]]
@@ -6697,7 +6725,7 @@ name = "nvidia-cudnn-cu13"
 version = "9.19.0.56"
 summary = ""
 dependencies = [
-    "nvidia-cublas; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "nvidia-cublas",
 ]
 files = [
     {file = "nvidia_cudnn_cu13-9.19.0.56-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:6ed29ffaee1176c612daf442e4dd6cfeb6a0caa43ddcbeb59da94953030b1be4"},
@@ -6709,7 +6737,7 @@ name = "nvidia-cufft"
 version = "12.0.0.61"
 summary = ""
 dependencies = [
-    "nvidia-nvjitlink; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "nvidia-nvjitlink",
 ]
 files = [
     {file = "nvidia_cufft-12.0.0.61-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2708c852ef8cd89d1d2068bdbece0aa188813a0c934db3779b9b1faa8442e5f5"},
@@ -6739,9 +6767,9 @@ name = "nvidia-cusolver"
 version = "12.0.4.66"
 summary = ""
 dependencies = [
-    "nvidia-cublas; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "nvidia-cusparse; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "nvidia-nvjitlink; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "nvidia-cublas",
+    "nvidia-cusparse",
+    "nvidia-nvjitlink",
 ]
 files = [
     {file = "nvidia_cusolver-12.0.4.66-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:02c2457eaa9e39de20f880f4bd8820e6a1cfb9f9a34f820eb12a155aa5bc92d2"},
@@ -6753,7 +6781,7 @@ name = "nvidia-cusparse"
 version = "12.6.3.3"
 summary = ""
 dependencies = [
-    "nvidia-nvjitlink; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "nvidia-nvjitlink",
 ]
 files = [
     {file = "nvidia_cusparse-12.6.3.3-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:80bcc4662f23f1054ee334a15c72b8940402975e0eab63178fc7e670aa59472c"},
@@ -6835,9 +6863,9 @@ name = "ocrmac"
 version = "1.0.1"
 summary = ""
 dependencies = [
-    "click; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pillow; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pyobjc-framework-vision; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "click",
+    "pillow",
+    "pyobjc-framework-vision",
 ]
 files = [
     {file = "ocrmac-1.0.1-py3-none-any.whl", hash = "sha256:1cef25426f7ae6bbd57fe3dc5553b25461ae8ad0d2b428a9bbadbf5907349024"},
@@ -7939,7 +7967,7 @@ name = "pexpect"
 version = "4.9.0"
 summary = ""
 dependencies = [
-    "ptyprocess; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "ptyprocess",
 ]
 files = [
     {file = "pexpect-4.9.0-py2.py3-none-any.whl", hash = "sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523"},
@@ -9016,7 +9044,7 @@ name = "pyobjc-framework-cocoa"
 version = "12.1"
 summary = ""
 dependencies = [
-    "pyobjc-core; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "pyobjc-core",
 ]
 files = [
     {file = "pyobjc_framework_cocoa-12.1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:5a3dcd491cacc2f5a197142b3c556d8aafa3963011110102a093349017705118"},
@@ -9029,8 +9057,8 @@ name = "pyobjc-framework-coreml"
 version = "12.1"
 summary = ""
 dependencies = [
-    "pyobjc-core; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pyobjc-framework-cocoa; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "pyobjc-core",
+    "pyobjc-framework-cocoa",
 ]
 files = [
     {file = "pyobjc_framework_coreml-12.1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:48fa3bb4a03fa23e0e36c93936dca2969598e4102f4b441e1663f535fc99cd31"},
@@ -9043,8 +9071,8 @@ name = "pyobjc-framework-quartz"
 version = "12.1"
 summary = ""
 dependencies = [
-    "pyobjc-core; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pyobjc-framework-cocoa; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "pyobjc-core",
+    "pyobjc-framework-cocoa",
 ]
 files = [
     {file = "pyobjc_framework_quartz-12.1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:629b7971b1b43a11617f1460cd218bd308dfea247cd4ee3842eb40ca6f588860"},
@@ -9057,10 +9085,10 @@ name = "pyobjc-framework-vision"
 version = "12.1"
 summary = ""
 dependencies = [
-    "pyobjc-core; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pyobjc-framework-cocoa; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pyobjc-framework-coreml; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "pyobjc-framework-quartz; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "pyobjc-core",
+    "pyobjc-framework-cocoa",
+    "pyobjc-framework-coreml",
+    "pyobjc-framework-quartz",
 ]
 files = [
     {file = "pyobjc_framework_vision-12.1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:7273e2508db4c2e88523b4b7ff38ac54808756e7ba01d78e6c08ea68f32577d2"},
@@ -10209,6 +10237,19 @@ files = [
 ]
 
 [[package]]
+name = "ruyaml"
+version = "0.91.0"
+summary = ""
+dependencies = [
+    "distro",
+    "setuptools",
+]
+files = [
+    {file = "ruyaml-0.91.0-py3-none-any.whl", hash = "sha256:50e0ee3389c77ad340e209472e0effd41ae0275246df00cdad0a067532171755"},
+    {file = "ruyaml-0.91.0.tar.gz", hash = "sha256:6ce9de9f4d082d696d3bde264664d1bcdca8f5a9dff9d1a1f1a127969ab871ab"},
+]
+
+[[package]]
 name = "s3transfer"
 version = "0.14.0"
 summary = ""
@@ -10477,8 +10518,8 @@ name = "secretstorage"
 version = "3.5.0"
 summary = ""
 dependencies = [
-    "cryptography; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
-    "jeepney; sys_platform != \"emscripten\" and sys_platform != \"win32\"",
+    "cryptography",
+    "jeepney",
 ]
 files = [
     {file = "secretstorage-3.5.0-py3-none-any.whl", hash = "sha256:0ce65888c0725fcb2c5bc0fdb8e5438eece02c523557ea40ce0703c266248137"},
@@ -12585,6 +12626,15 @@ files = [
 ]
 
 [[package]]
+name = "win32-setctime"
+version = "1.2.0"
+summary = ""
+files = [
+    {file = "win32_setctime-1.2.0-py3-none-any.whl", hash = "sha256:95d644c4e708aba81dc3704a116d8cbc974d70b3bdb8be1d150e36be6e9d1390"},
+    {file = "win32_setctime-1.2.0.tar.gz", hash = "sha256:ae1fdf948f5640aae05c511ade119313fb6a30d7eabe25fef9764dca5873c4c0"},
+]
+
+[[package]]
 name = "wrapt"
 version = "1.17.3"
 summary = ""
@@ -12695,6 +12745,21 @@ dependencies = [
 files = [
     {file = "yagmail-0.15.293-py2.py3-none-any.whl", hash = "sha256:947a0864e4a64452c8e6b58c80b5bf45389bf8842d779701febfd34fa09649c7"},
     {file = "yagmail-0.15.293.tar.gz", hash = "sha256:44e8d0cda4f63e22a14902cc9096d52197fd0ced023d50b0409325f401585296"},
+]
+
+[[package]]
+name = "yamlfix"
+version = "1.19.1"
+summary = ""
+dependencies = [
+    "click",
+    "maison",
+    "pydantic",
+    "ruyaml",
+]
+files = [
+    {file = "yamlfix-1.19.1-py3-none-any.whl", hash = "sha256:b885fcf171a2eb59df83c219355bb17dd147675645e2756754372c0bd0b80ea5"},
+    {file = "yamlfix-1.19.1.tar.gz", hash = "sha256:05f6add13959637564f278e9237f6e201ff75e061a0a4cb9fc06fa95c3001a22"},
 ]
 
 [[package]]
