@@ -11,6 +11,10 @@ from perplexity_at_home.agents.deep_research.context import (
     DeepResearchContextBase,
 )
 from perplexity_at_home.agents.deep_research.graph import build_deep_research_graph
+from perplexity_at_home.agents.deep_research.runtime import (
+    deep_research_agent_context,
+    run_deep_research,
+)
 from perplexity_at_home.agents.deep_research.state import (
     DeepResearchState,
     DeepResearchStateBase,
@@ -30,4 +34,6 @@ __all__ = [
     "ReflectionDecisionRecord",
     "build_deep_research_agent",
     "build_deep_research_graph",
+    "deep_research_agent_context",
+    "run_deep_research",
 ]

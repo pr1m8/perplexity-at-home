@@ -39,7 +39,13 @@ from perplexity_at_home.agents.deep_research.query_agent.prompts import (
 from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_query_agent(model: str | None = None) -> Any:
+def build_query_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the deep-research query-generation child agent.
 
     Args:
@@ -56,7 +62,7 @@ def build_query_agent(model: str | None = None) -> Any:
         >>> agent is not None
         True
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
     resolved_model = resolve_model(model, settings.resolved_deep_research_query_model)
 
@@ -65,7 +71,9 @@ def build_query_agent(model: str | None = None) -> Any:
         tools=[],
         middleware=[query_agent_prompt],
         context_schema=DeepResearchContext,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(DeepResearchQueryPlans),
+        debug=debug,
         name="deep_research_query_agent",
     )

@@ -47,7 +47,13 @@ from perplexity_at_home.agents.pro_search.context import ProSearchContext
 from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_answer_agent(model: str | None = None) -> Any:
+def build_answer_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the pro-search answer-synthesis child agent.
 
     Args:
@@ -65,7 +71,7 @@ def build_answer_agent(model: str | None = None) -> Any:
         >>> agent is not None
         True
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
     resolved_model = resolve_model(model, settings.resolved_pro_search_answer_model)
 
@@ -74,7 +80,9 @@ def build_answer_agent(model: str | None = None) -> Any:
         tools=[],
         middleware=[answer_agent_prompt],
         context_schema=ProSearchContext,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(ProSearchAnswer),
+        debug=debug,
         name="pro_search_answer_agent",
     )

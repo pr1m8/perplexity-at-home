@@ -52,7 +52,7 @@ from __future__ import annotations
 
 import ast
 import json
-from typing import Any
+from typing import Any, Protocol
 from uuid import uuid4
 
 from langchain_core.messages import AIMessage, ToolMessage
@@ -73,6 +73,19 @@ from perplexity_at_home.tools.tavily.normalize import (
     extract_answer,
     normalize_search_payload,
 )
+
+
+class SupportsInvoke(Protocol):
+    """Protocol for child agents invoked by the top-level graph."""
+
+    def invoke(
+        self,
+        input: dict[str, Any],
+        *,
+        context: ProSearchContext,
+        config: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Invoke the child agent."""
 
 
 def _extract_latest_user_question(state: ProSearchState) -> str:
@@ -206,7 +219,14 @@ def _deduplicate_aggregated_results(
     return deduplicated
 
 
-def build_pro_search_graph() -> Any:
+def build_pro_search_graph(
+    *,
+    query_agent: SupportsInvoke | None = None,
+    answer_agent: SupportsInvoke | None = None,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the full pro-search graph.
 
     Returns:
@@ -221,8 +241,16 @@ def build_pro_search_graph() -> Any:
         >>> graph is not None
         True
     """
-    query_agent = build_query_generator_agent()
-    answer_agent = build_answer_agent()
+    resolved_query_agent = query_agent or build_query_generator_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
+    resolved_answer_agent = answer_agent or build_answer_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
     pro_bundle = build_pro_bundle()
     search_tool = pro_bundle["search"]
     tool_node = ToolNode([search_tool])
@@ -247,7 +275,7 @@ def build_pro_search_graph() -> Any:
         context = runtime.context
         user_question = _extract_latest_user_question(state)
 
-        result = query_agent.invoke(
+        result = resolved_query_agent.invoke(
             {
                 "messages": [
                     {
@@ -439,7 +467,7 @@ def build_pro_search_graph() -> Any:
             "search_errors": state.get("search_errors", []),
         }
 
-        result = answer_agent.invoke(
+        result = resolved_answer_agent.invoke(
             {
                 "messages": [
                     {
@@ -476,4 +504,9 @@ def build_pro_search_graph() -> Any:
     graph.add_edge("aggregate_search_results", "synthesize_answer")
     graph.add_edge("synthesize_answer", END)
 
-    return graph.compile()
+    return graph.compile(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+        name="pro_search",
+    )

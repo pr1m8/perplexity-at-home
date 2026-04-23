@@ -350,11 +350,31 @@ def build_deep_research_graph(
     debug: bool = False,
 ) -> Any:
     """Build the compiled top-level deep-research graph."""
-    resolved_planner_agent = planner_agent or build_planner_agent()
-    resolved_query_agent = query_agent or build_query_agent()
-    resolved_retrieval_agent = retrieval_agent or build_retrieval_agent()
-    resolved_reflection_agent = reflection_agent or build_reflection_agent()
-    resolved_answer_agent = answer_agent or build_answer_agent()
+    resolved_planner_agent = planner_agent or build_planner_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
+    resolved_query_agent = query_agent or build_query_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
+    resolved_retrieval_agent = retrieval_agent or build_retrieval_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
+    resolved_reflection_agent = reflection_agent or build_reflection_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
+    resolved_answer_agent = answer_agent or build_answer_agent(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
 
     def plan_research(
         state: DeepResearchState,

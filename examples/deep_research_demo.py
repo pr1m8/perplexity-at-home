@@ -7,10 +7,8 @@ import json
 
 from dotenv import load_dotenv
 
-from perplexity_at_home.agents.deep_research import (
-    DeepResearchContext,
-    build_deep_research_agent,
-)
+from perplexity_at_home.agents.deep_research import DeepResearchContext
+from perplexity_at_home.agents.deep_research.runtime import run_deep_research
 from perplexity_at_home.utils import get_current_datetime_string
 
 
@@ -24,13 +22,14 @@ async def run_demo(question: str) -> None:
     """Run the deep-research workflow demo."""
     load_dotenv()
 
-    agent = build_deep_research_agent(
+    result = await run_deep_research(
+        question,
         context=DeepResearchContext(
             current_datetime=get_current_datetime_string(),
             thread_id="deep-research-demo",
-        )
+        ),
+        persistent=False,
     )
-    result = await agent.ainvoke(question)
     final_answer = result.get("final_answer", result)
     print(json.dumps(final_answer, indent=2, default=str))
 

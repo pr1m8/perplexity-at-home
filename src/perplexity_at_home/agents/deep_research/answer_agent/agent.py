@@ -38,7 +38,13 @@ from perplexity_at_home.agents.deep_research.context import DeepResearchContext
 from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_answer_agent(model: str | None = None) -> Any:
+def build_answer_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the deep-research answer child agent.
 
     Args:
@@ -50,7 +56,7 @@ def build_answer_agent(model: str | None = None) -> Any:
     Raises:
         RuntimeError: Propagated if agent construction fails.
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
     resolved_model = resolve_model(model, settings.resolved_deep_research_answer_model)
 
@@ -59,7 +65,9 @@ def build_answer_agent(model: str | None = None) -> Any:
         tools=[],
         middleware=[answer_prompt],
         context_schema=DeepResearchContext,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(DeepResearchAnswer),
+        debug=debug,
         name="deep_research_answer_agent",
     )

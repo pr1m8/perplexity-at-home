@@ -42,3 +42,12 @@ def test_postgres_uri_escapes_credentials() -> None:
     assert settings.postgres.uri == (
         "postgresql://local+user:p%40ss+word@db.internal:6543/graph_data?sslmode=require"
     )
+
+
+def test_empty_env_values_are_ignored(monkeypatch) -> None:
+    monkeypatch.setenv("POSTGRES_PORT", "")
+    monkeypatch.setenv("PERPLEXITY_AT_HOME_POSTGRES__PORT", "")
+
+    settings = AppSettings(_env_file=None)
+
+    assert settings.postgres.port == 5442

@@ -96,10 +96,17 @@ class ProSearchAgent:
 def build_pro_search_agent(
     *,
     context: ProSearchContext | None = None,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
 ) -> ProSearchAgent:
     """Build the top-level pro-search workflow wrapper."""
     resolved_context = context or ProSearchContext()
-    graph = build_pro_search_graph()
+    graph = build_pro_search_graph(
+        checkpointer=checkpointer,
+        store=store,
+        debug=debug,
+    )
     return ProSearchAgent(
         context=resolved_context,
         graph=graph,

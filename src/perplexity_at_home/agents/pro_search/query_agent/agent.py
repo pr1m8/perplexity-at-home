@@ -36,7 +36,13 @@ from perplexity_at_home.agents.pro_search.query_agent.state import QueryAgentSta
 from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_query_generator_agent(model: str | None = None) -> Any:
+def build_query_generator_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the pro-search query-generation agent.
 
     Args:
@@ -54,7 +60,7 @@ def build_query_generator_agent(model: str | None = None) -> Any:
         >>> agent is not None
         True
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
     resolved_model = resolve_model(model, settings.resolved_pro_search_query_model)
 
@@ -64,7 +70,9 @@ def build_query_generator_agent(model: str | None = None) -> Any:
         middleware=[query_generator_prompt],
         context_schema=QueryAgentContext,
         state_schema=QueryAgentState,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(ProSearchQueryPlan),
+        debug=debug,
         name="pro_search_query_generator_agent",
     )

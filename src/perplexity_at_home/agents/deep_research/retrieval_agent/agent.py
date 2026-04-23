@@ -47,7 +47,13 @@ from perplexity_at_home.tools.tavily import (
 )
 
 
-def build_retrieval_agent(model: str | None = None) -> Any:
+def build_retrieval_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the deep-research retrieval child agent.
 
     Args:
@@ -64,7 +70,7 @@ def build_retrieval_agent(model: str | None = None) -> Any:
         >>> agent is not None
         True
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
     resolved_model = resolve_model(model, settings.resolved_deep_research_retrieval_model)
 
@@ -82,7 +88,9 @@ def build_retrieval_agent(model: str | None = None) -> Any:
         tools=tools,
         middleware=[retrieval_agent_prompt],
         context_schema=DeepResearchContext,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(RetrievalAgentResult),
+        debug=debug,
         name="deep_research_retrieval_agent",
     )

@@ -50,6 +50,7 @@ class AppSettings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
+        env_ignore_empty=True,
         extra="ignore",
         case_sensitive=False,
         populate_by_name=True,

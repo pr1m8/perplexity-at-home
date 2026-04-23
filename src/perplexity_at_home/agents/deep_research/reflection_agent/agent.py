@@ -38,7 +38,13 @@ from perplexity_at_home.agents.deep_research.reflection_agent.prompts import (
 from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_reflection_agent(model: str | None = None) -> Any:
+def build_reflection_agent(
+    model: str | None = None,
+    *,
+    checkpointer: Any = None,
+    store: Any = None,
+    debug: bool = False,
+) -> Any:
     """Build the deep-research reflection child agent.
 
     Args:
@@ -55,7 +61,7 @@ def build_reflection_agent(model: str | None = None) -> Any:
         >>> agent is not None
         True
     """
-    memory = MemorySaver()
+    resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
     resolved_model = resolve_model(model, settings.resolved_deep_research_reflection_model)
 
@@ -64,7 +70,9 @@ def build_reflection_agent(model: str | None = None) -> Any:
         tools=[],
         middleware=[reflection_prompt],
         context_schema=DeepResearchContext,
-        checkpointer=memory,
+        checkpointer=resolved_checkpointer,
+        store=store,
         response_format=ToolStrategy(ReflectionDecision),
+        debug=debug,
         name="deep_research_reflection_agent",
     )
