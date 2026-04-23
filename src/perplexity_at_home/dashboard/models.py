@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, field_validator
@@ -64,9 +64,10 @@ class SearchWorkflow(StrEnum):
         """Return the major execution stages for the workflow."""
         return {
             SearchWorkflow.QUICK: (
-                "Understand question",
-                "Search the web",
-                "Draft concise answer",
+                "Scope the question",
+                "Run focused retrieval",
+                "Optionally inspect one source",
+                "Draft cited answer",
             ),
             SearchWorkflow.PRO: (
                 "Plan search set",
@@ -109,31 +110,70 @@ class SearchWorkflow(StrEnum):
         """Return a Mermaid diagram describing the workflow."""
         return {
             SearchWorkflow.QUICK: """
-flowchart LR
-    Q[Question] --> A[quick_search_agent]
-    A --> T[Tavily quick bundle]
-    T --> A
-    A --> R[Structured answer with citations]
+flowchart TD
+    U[User question] --> A[quick_search_agent]
+    A --> C[Interpret scope and time constraints]
+    C --> Q[Generate one focused Tavily query]
+    Q --> S[tavily_search]
+    S --> D{Need a closer read?}
+    D -->|yes| X[tavily_extract]
+    D -->|no| F[Draft cited answer]
+    X --> F
+    F --> R[Structured quick answer]
 """.strip(),
             SearchWorkflow.PRO: """
-flowchart LR
-    Q[Question] --> P[Query planner]
-    P --> T[Tavily ToolNode]
-    T --> A[Evidence aggregation]
-    A --> S[Answer agent]
-    S --> R[Markdown answer]
+flowchart TD
+    U[User question] --> P[generate_query_plan]
+    P --> B[build_batch_search_calls]
+    B --> T[run_search_tools]
+    T --> A[aggregate_search_results]
+    A --> S[synthesize_answer]
+    S --> R[Markdown answer with citations]
 """.strip(),
             SearchWorkflow.DEEP: """
 flowchart TD
-    Q[Question] --> P[Planner agent]
-    P --> QA[Query agent]
-    QA --> RA[Retrieval agent]
-    RA --> RF[Reflection agent]
-    RF -->|enough evidence| AA[Answer agent]
-    RF -->|follow-up required| QA
-    AA --> R[Report markdown]
+    U[Original question] --> P[plan_research]
+    P -->|needs clarification| C[request_clarification]
+    P -->|ready| G[generate_query_plans]
+
+    subgraph Retrieval Loop
+        G --> R[run_retrieval]
+        R --> F[reflect_on_evidence]
+        F -->|enough evidence| A[synthesize_answer]
+        F -->|requery| RQ[prepare_requery_followup]
+        F -->|extract| EX[prepare_extract_followup]
+        F -->|map| MP[prepare_map_followup]
+        F -->|crawl| CR[prepare_crawl_followup]
+        F -->|research| RS[prepare_research_followup]
+        RQ --> R
+        EX --> R
+        MP --> R
+        CR --> R
+        RS --> R
+    end
+
+    A --> O[Report markdown + findings]
 """.strip(),
         }[self]
+
+
+class DashboardActivityEvent(BaseModel):
+    """A normalized live workflow event shown in the dashboard activity panel."""
+
+    kind: Literal["status", "node", "tool", "state", "warning", "error"]
+    title: str
+    detail: str | None = None
+    node_name: str | None = None
+    namespace: tuple[str, ...] = Field(default_factory=tuple)
+    payload: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    @property
+    def display_line(self) -> str:
+        """Return a compact human-facing timeline line."""
+        if self.detail:
+            return f"{self.title}: {self.detail}"
+        return self.title
 
 
 class DashboardCitation(BaseModel):
@@ -251,6 +291,18 @@ class DashboardThreadRecord(BaseModel):
                 "turn_count": self.turn_count + 1,
                 "last_question": stripped_question,
                 "last_summary": result.primary_summary,
+            }
+        )
+
+    def clear(self) -> DashboardThreadRecord:
+        """Return a cleared thread record that keeps the thread identifier."""
+        return self.model_copy(
+            update={
+                "updated_at": datetime.now(UTC),
+                "title": None,
+                "turn_count": 0,
+                "last_question": None,
+                "last_summary": None,
             }
         )
 

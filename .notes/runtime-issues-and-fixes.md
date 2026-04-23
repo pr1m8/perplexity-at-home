@@ -167,3 +167,59 @@ validation pass.
 
 Use the normal `pytest` suite for deterministic validation. Use `make test-e2e`
 or the GitHub `Live E2E` workflow for actual networked verification.
+
+## 8. The original dashboard looked static because it only consumed final results
+
+**Symptom**
+
+The UI showed a final answer and some summary cards, but no real node activity,
+no meaningful run state, weak graph visibility, and no persistence rehydration
+after reloads.
+
+**Root cause**
+
+The previous dashboard service only returned one normalized final result. The
+Streamlit layer kept thread and history state only in `st.session_state`, so
+the LangGraph Postgres store/checkpointer were not being used to rebuild the
+dashboard itself after refreshes.
+
+**Fix**
+
+- stream `tasks`, `updates`, and `values` from the compiled graphs
+- normalize those into dashboard activity events
+- persist dashboard thread/history metadata into the LangGraph Postgres store
+- rehydrate thread lists, turn history, and latest graph state from Postgres
+- replace deprecated `st.components.v1.html` and `use_container_width` usage
+
+**Rule going forward**
+
+If a dashboard feature needs to survive a reload, store it explicitly in the
+backing persistence layer. Do not assume LangGraph checkpointing alone will
+rebuild UI-facing thread metadata.
+
+## 9. Streamlit startup noise came from the runtime shell, not the workflows
+
+**Symptom**
+
+The dashboard startup dumped large `transformers` path-inspection spam, plus
+an `authlib` deprecation warning, which made the app feel unstable even when
+the workflows themselves were fine.
+
+**Root cause**
+
+- Streamlit file watching was touching heavy optional imports too early
+- the dashboard service eagerly imported all workflow packages at module import
+- the Streamlit launcher surfaced a noisy `authlib` warning that was unrelated
+  to actual dashboard behavior
+
+**Fix**
+
+- lazy-load workflow builders inside the dashboard service
+- launch Streamlit with `--server.fileWatcherType none`
+- filter the known `authlib` stderr lines in the packaged dashboard launcher
+
+**Rule going forward**
+
+Prefer lazy imports in the dashboard/runtime shell. If third-party startup
+noise is harmless but persistent, filter it at the launcher boundary rather
+than burying real workflow errors deeper in the stack.

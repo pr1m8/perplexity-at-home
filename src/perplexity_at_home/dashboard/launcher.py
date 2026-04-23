@@ -13,6 +13,12 @@ __all__ = [
     "main",
 ]
 
+_SUPPRESSED_STDERR_FRAGMENTS = (
+    "authlib.jose module is deprecated, please use joserfc instead.",
+    "It will be compatible before version 2.0.0.",
+    "from authlib.jose import ECKey",
+)
+
 
 def build_streamlit_command(
     *,
@@ -34,6 +40,8 @@ def build_streamlit_command(
         str(port),
         "--server.headless",
         str(headless).lower(),
+        "--server.fileWatcherType",
+        "none",
     ]
 
 
@@ -45,8 +53,18 @@ def launch_dashboard(
 ) -> int:
     """Launch the Streamlit dashboard and return the process exit code."""
     command = build_streamlit_command(host=host, port=port, headless=headless)
-    completed = subprocess.run(command, check=False)
-    return completed.returncode
+    with subprocess.Popen(
+        command,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+    ) as process:
+        if process.stderr is not None:
+            for line in process.stderr:
+                if any(fragment in line for fragment in _SUPPRESSED_STDERR_FRAGMENTS):
+                    continue
+                print(line, end="", file=sys.stderr)
+        return process.wait()
 
 
 def main(argv: list[str] | None = None) -> int:

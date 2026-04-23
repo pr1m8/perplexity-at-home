@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from base64 import b64encode
 from html import escape
 
 from perplexity_at_home.dashboard.models import DashboardThreadRecord
 
 __all__ = [
     "build_mermaid_embed",
+    "build_mermaid_iframe_src",
     "format_thread_label",
 ]
 
@@ -116,3 +118,19 @@ def build_mermaid_embed(
   </body>
 </html>
 """.strip()
+
+
+def build_mermaid_iframe_src(
+    mermaid_text: str,
+    *,
+    title: str,
+    subtitle: str,
+) -> str:
+    """Return a data URI that Streamlit can render via ``st.iframe``."""
+    html = build_mermaid_embed(
+        mermaid_text,
+        title=title,
+        subtitle=subtitle,
+    )
+    encoded = b64encode(html.encode("utf-8")).decode("ascii")
+    return f"data:text/html;base64,{encoded}"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from perplexity_at_home.dashboard.models import (
+    DashboardActivityEvent,
     DashboardCitation,
     DashboardRunResult,
     DashboardThreadRecord,
@@ -8,6 +9,7 @@ from perplexity_at_home.dashboard.models import (
 )
 from perplexity_at_home.dashboard.presentation import (
     build_mermaid_embed,
+    build_mermaid_iframe_src,
     format_thread_label,
 )
 
@@ -63,6 +65,19 @@ def test_dashboard_thread_record_updates_after_turn() -> None:
     assert updated.last_question == "Compare Tavily and Exa"
     assert updated.title == "Compare Tavily and Exa"
     assert updated.display_label.startswith("Compare Tavily and Exa")
+    cleared = updated.clear()
+    assert cleared.turn_count == 0
+    assert cleared.last_summary is None
+
+
+def test_dashboard_activity_event_display_line() -> None:
+    event = DashboardActivityEvent(
+        kind="tool",
+        title="Retrieval tools prepared tools",
+        detail="1 tool call prepared: tavily_search",
+    )
+
+    assert "tavily_search" in event.display_line
 
 
 def test_presentation_helpers_render_expected_text() -> None:
@@ -84,3 +99,10 @@ def test_presentation_helpers_render_expected_text() -> None:
     assert "Pro Search graph" in html
     assert "Planned search flow" in html
     assert "mermaid" in html
+    iframe_src = build_mermaid_iframe_src(
+        SearchWorkflow.DEEP.graph_mermaid,
+        title="Deep Research graph",
+        subtitle="Iterative retrieval loop",
+    )
+
+    assert iframe_src.startswith("data:text/html;base64,")
