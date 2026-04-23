@@ -50,7 +50,7 @@ jobs:
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           test "$PACKAGE_VERSION" = "$TAG_VERSION"
       - name: Install release dependencies
-        run: pdm sync -G test -G lint -G docs
+        run: pdm sync -G :all
       - name: Run Ruff
         run: pdm run ruff check src tests
       - name: Run pytest

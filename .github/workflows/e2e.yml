@@ -63,7 +63,7 @@ jobs:
           echo "OPENAI_API_KEY and TAVILY_API_KEY must be set for Live E2E."
           exit 1
       - name: Install test dependencies
-        run: pdm sync -G test
+        run: pdm sync -G :all
       - name: Run live E2E suite
         run:
           pdm run pytest --no-cov -p no:rerunfailures -m e2e tests/test_live_e2e.py

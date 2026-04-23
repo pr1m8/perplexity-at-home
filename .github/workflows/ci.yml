@@ -40,8 +40,8 @@ jobs:
           pdm config python.use_venv true
       - name: Check lockfile is up to date
         run: pdm lock --check
-      - name: Install all locked dependencies
-        run: pdm sync
+      - name: Install CI dependencies
+        run: pdm sync -G :all
       - name: Run Ruff
         run: pdm run ruff check src tests
       - name: Run pytest

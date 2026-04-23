@@ -32,7 +32,7 @@ jobs:
       - name: Configure PDM to use uv
         run: pdm config use_uv true
       - name: Install docs dependencies
-        run: pdm sync -G docs
+        run: pdm sync -G :all
       - name: Build docs
         run: pdm run mkdocs build --strict
       - name: Upload site artifact
