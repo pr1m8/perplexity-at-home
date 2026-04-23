@@ -15,7 +15,7 @@ builder for simpler question-answer flows.
 - a dashboard surface for switching between all three workflows
 - runnable demos under `examples/`
 - unit and integration coverage around settings, graph construction, persistence,
-  and the CLI surface
+  the CLI surface, plus gated live E2E coverage for real external services
 
 ## Core commands
 
@@ -25,6 +25,7 @@ pdm run perplexity-at-home deep-research "What is Tavily?"
 make infra-up
 make infra-setup
 pdm run perplexity-at-home deep-research --persistent "What is Tavily?"
+make test-e2e
 ```
 
 ## Documentation map

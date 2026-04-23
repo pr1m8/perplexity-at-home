@@ -4,18 +4,29 @@
 
 ```mermaid
 flowchart TD
-    A[User question] --> B[Planner agent]
-    B --> C[Query agent]
-    C --> D[Retrieval agent]
-    D --> E[Reflection agent]
-    E -->|enough evidence| F[Answer agent]
-    E -->|follow-up needed| C
-    F --> G[Markdown report]
+    A[User question] --> B[plan_research]
+    B -->|needs clarification| C[request_clarification]
+    B -->|scoped| D[generate_query_plans]
+    D --> E[run_retrieval]
+    E --> F[(evidence_items + open_gaps)]
+    F --> G[reflect_on_evidence]
+    G -->|sufficient| H[synthesize_answer]
+    G -->|requery| I[prepare_requery_followup]
+    G -->|extract| J[prepare_extract_followup]
+    G -->|map| K[prepare_map_followup]
+    G -->|crawl| L[prepare_crawl_followup]
+    G -->|research| M[prepare_research_followup]
+    I --> E
+    J --> E
+    K --> E
+    L --> E
+    M --> E
+    H --> N[Markdown report]
 ```
 
 The top-level graph lives in `src/perplexity_at_home/agents/deep_research/graph.py`.
 It composes specialized child agents instead of forcing one agent to plan,
-retrieve, critique, and synthesize in a single step.
+retrieve, critique, route follow-up work, and synthesize in a single step.
 
 ## Persistence model
 
@@ -47,6 +58,7 @@ checkpointer entrypoints directly.
 
 ## Current testing shape
 
-The repository has strong unit and integration coverage, but not a full
-external-service E2E suite yet. Live runs against OpenAI, Tavily, and Postgres
-are currently validated manually or in targeted local checks.
+The repository has unit and graph coverage for local deterministic behavior,
+plus a gated live E2E layer for OpenAI, Tavily, and Postgres-backed runs. The
+live suite is opt-in so normal CI remains deterministic, while the `Live E2E`
+workflow can validate the real external path when credentials are configured.

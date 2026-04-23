@@ -47,6 +47,7 @@ Homepage = "https://github.com/pr1m8/perplexity-at-home"
 Repository = "https://github.com/pr1m8/perplexity-at-home"
 Issues = "https://github.com/pr1m8/perplexity-at-home/issues"
 Documentation = "https://perplexity-at-home.readthedocs.io/"
+Changelog = "https://github.com/pr1m8/perplexity-at-home/releases"
 
 [project.scripts]
 perplexity-at-home = "perplexity_at_home.cli:main"
@@ -620,6 +621,9 @@ addopts = [
     "--html-output=reports/report_output",
     "--should-open-report=never",
     "--capture-screenshots=failed",
+]
+markers = [
+    "e2e: live external-service end-to-end tests",
 ]
 xfail_strict = true
 

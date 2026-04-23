@@ -58,6 +58,10 @@ pdm run perplexity-at-home dashboard
 ```bash
 make lint
 make test
+make test-e2e
 make docs-build
 pdm build
 ```
+
+`make test-e2e` is opt-in and expects real `OPENAI_API_KEY`, `TAVILY_API_KEY`,
+and a reachable Postgres instance.

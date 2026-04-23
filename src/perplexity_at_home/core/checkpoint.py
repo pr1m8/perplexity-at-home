@@ -27,6 +27,7 @@ from contextlib import asynccontextmanager
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
+from perplexity_at_home.core.serde import build_checkpointer_serde
 from perplexity_at_home.settings import get_settings
 
 __all__ = [
@@ -77,7 +78,13 @@ async def checkpoint_context(*, setup: bool = False) -> AsyncIterator[AsyncPostg
             async with checkpoint_context(setup=True):
                 pass
     """
-    async with AsyncPostgresSaver.from_conn_string(get_checkpointer_uri()) as checkpointer:
+    settings = get_settings()
+    settings.apply_runtime_environment()
+
+    async with AsyncPostgresSaver.from_conn_string(
+        get_checkpointer_uri(),
+        serde=build_checkpointer_serde(),
+    ) as checkpointer:
         if setup:
             await checkpointer.setup()
         yield checkpointer

@@ -2,34 +2,34 @@
 
 [![CI](https://github.com/pr1m8/perplexity-at-home/actions/workflows/ci.yml/badge.svg)](https://github.com/pr1m8/perplexity-at-home/actions/workflows/ci.yml)
 [![Docs](https://github.com/pr1m8/perplexity-at-home/actions/workflows/docs.yml/badge.svg)](https://github.com/pr1m8/perplexity-at-home/actions/workflows/docs.yml)
+[![Live E2E](https://github.com/pr1m8/perplexity-at-home/actions/workflows/e2e.yml/badge.svg)](https://github.com/pr1m8/perplexity-at-home/actions/workflows/e2e.yml)
 [![Read the Docs](https://img.shields.io/readthedocs/perplexity-at-home)](https://perplexity-at-home.readthedocs.io/)
 [![PyPI](https://img.shields.io/pypi/v/perplexity-at-home)](https://pypi.org/project/perplexity-at-home/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/perplexity-at-home)](https://pypi.org/project/perplexity-at-home/)
 [![License](https://img.shields.io/github/license/pr1m8/perplexity-at-home)](LICENSE)
 
-`perplexity-at-home` is a package of Perplexity-style research agents built on
-LangGraph, Tavily, OpenAI, and optional Postgres-backed persistence. It ships
-three distinct workflows instead of one overloaded agent, uses Pydantic
-Settings for runtime configuration, defaults to GPT-5.4, and includes a
-packaged Streamlit dashboard.
+`perplexity-at-home` is a packaged research runtime built with LangGraph, Tavily,
+OpenAI, and optional Postgres persistence. It ships three distinct research
+lanes, defaults to `openai:gpt-5.4`, exposes a packaged Streamlit dashboard,
+and keeps runtime configuration centralized in Pydantic Settings.
 
-The repo is designed around a simple idea: fast questions, broader search, and
-true deep research should not share the same graph.
+The point of the package is simple: quick answers, broader synthesis, and real
+deep research should not be the same graph.
 
-## What Ships
+## Research Lanes
 
-| Workflow        | Shape                                             | Output                                 | Core module                                    |
-| --------------- | ------------------------------------------------- | -------------------------------------- | ---------------------------------------------- |
-| `quick-search`  | single-agent call with Tavily tools               | concise markdown answer with citations | `src/perplexity_at_home/agents/quick_search/`  |
-| `pro-search`    | planned search graph with parallel tool execution | synthesized markdown answer            | `src/perplexity_at_home/agents/pro_search/`    |
-| `deep-research` | multi-agent graph with reflection loop            | report-style markdown brief            | `src/perplexity_at_home/agents/deep_research/` |
+| Workflow        | Shape                                      | Best for                     | Output                                      |
+| --------------- | ------------------------------------------ | ---------------------------- | ------------------------------------------- |
+| `quick-search`  | single answering agent with Tavily tools   | fast factual questions       | concise markdown answer with citations      |
+| `pro-search`    | explicit planning and aggregation graph    | broader web-backed synthesis | structured markdown answer                  |
+| `deep-research` | multi-agent LangGraph with reflection loop | report-style investigation   | long-form brief with evidence and citations |
 
-## Hyper Flow
+## System Map
 
 ```mermaid
 flowchart LR
     U[User question] --> S{Surface}
-    S --> CLI[Package CLI]
+    S --> CLI[CLI]
     S --> DASH[Streamlit dashboard]
     S --> LG[LangGraph runtime]
 
@@ -41,24 +41,24 @@ flowchart LR
     W --> PS[Pro Search]
     W --> DR[Deep Research]
 
-    QS --> OAI[OpenAI model]
-    PS --> OAI
-    DR --> OAI
+    QS --> LLM[GPT-5.4 family]
+    PS --> LLM
+    DR --> LLM
 
     QS --> TV[Tavily tools]
     PS --> TV
     DR --> TV
 
-    QS -->|optional| PG[(Postgres store + checkpointer)]
-    PS -->|optional| PG
-    DR -->|optional| PG
+    QS -->|optional| P[(Postgres store + checkpointer)]
+    PS -->|optional| P
+    DR -->|optional| P
 
     QS -->|optional| LS[LangSmith tracing]
     PS -->|optional| LS
     DR -->|optional| LS
 ```
 
-## Agent Graphs
+## Workflow Graphs
 
 ### Quick Search
 
@@ -67,69 +67,88 @@ flowchart LR
     Q[Question] --> A[quick_search_agent]
     A --> T[Tavily quick bundle]
     T --> A
-    A --> R[Structured answer with citations]
+    A --> R[Structured answer]
 ```
 
-`quick-search` is the thinnest lane. It favors speed and a clean answer path
-over orchestration depth. The runtime lives in
-`src/perplexity_at_home/agents/quick_search/runtime.py`.
+`quick-search` stays intentionally thin. It is the fastest lane and favors a
+clean answer path over orchestration depth.
 
 ### Pro Search
 
 ```mermaid
 flowchart LR
-    Q[Question] --> P[Query planner]
-    P --> T[Tavily ToolNode]
-    T --> A[Evidence aggregation]
-    A --> S[Answer agent]
+    Q[Question] --> P[generate_query_plan]
+    P --> B[build_batch_search_calls]
+    B --> T[run_search_tools]
+    T --> A[aggregate_search_results]
+    A --> S[synthesize_answer]
     S --> R[Markdown answer]
 ```
 
-`pro-search` is the middle lane: plan a small search set, execute tools in
-parallel, normalize evidence, then synthesize. The compiled graph lives in
-`src/perplexity_at_home/agents/pro_search/graph.py`.
+`pro-search` is the middle lane: plan a small query set, execute Tavily calls,
+normalize evidence, then synthesize a grounded answer.
 
 ### Deep Research
 
 ```mermaid
 flowchart TD
-    Q[Question] --> P[Planner agent]
-    P --> QA[Query agent]
-    QA --> RA[Retrieval agent]
-    RA --> RF[Reflection agent]
-    RF -->|enough evidence| AA[Answer agent]
-    RF -->|follow-up required| QA
-    AA --> R[Report markdown]
+    Q[Question] --> PLAN[plan_research]
+    PLAN -->|needs clarification| CLARIFY[request_clarification]
+    PLAN -->|scoped| QUERY[generate_query_plans]
+
+    QUERY --> RETRIEVE[run_retrieval]
+    RETRIEVE --> EVIDENCE[(evidence_items + open_gaps)]
+    EVIDENCE --> REFLECT[reflect_on_evidence]
+
+    REFLECT -->|sufficient| ANSWER[synthesize_answer]
+    REFLECT -->|requery| RQ[prepare_requery_followup]
+    REFLECT -->|extract| EX[prepare_extract_followup]
+    REFLECT -->|map| MAP[prepare_map_followup]
+    REFLECT -->|crawl| CR[prepare_crawl_followup]
+    REFLECT -->|research| RS[prepare_research_followup]
+
+    RQ --> RETRIEVE
+    EX --> RETRIEVE
+    MAP --> RETRIEVE
+    CR --> RETRIEVE
+    RS --> RETRIEVE
+
+    ANSWER --> REPORT[Report markdown + citations]
 ```
 
-`deep-research` is the full research loop. It decomposes the task, retrieves
-evidence, critiques coverage, and re-queries when evidence is weak before
-writing the final brief. The top-level graph lives in
-`src/perplexity_at_home/agents/deep_research/graph.py`.
+`deep-research` is the real DAG-heavy lane. It scopes the job, decomposes it,
+routes retrieval strategy, critiques coverage, and loops until the evidence is
+good enough or the iteration budget is exhausted.
 
-## Runtime Surfaces
+## How To Run
 
-The package exposes the same workflows through three entry points:
-
-| Surface                        | What it does                                                                        | Notes                                          |
-| ------------------------------ | ----------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `perplexity-at-home`           | CLI for `quick-search`, `pro-search`, `deep-research`, and persistence setup        | implemented in `src/perplexity_at_home/cli.py` |
-| `perplexity-at-home-dashboard` | packaged Streamlit app with workflow switching and thread-aware runs                | optional `dashboard` dependency group          |
-| `langgraph.json`               | LangGraph runtime entrypoints for `quick_search`, `pro_search`, and `deep_research` | also wires the custom store and checkpointer   |
-
-## Quickstart
+Install the package dependencies:
 
 ```bash
 pdm install -G test -G docs
 cp .env.example .env
 ```
 
-Run each lane from the CLI:
+Minimal environment:
+
+- `OPENAI_API_KEY`
+- `TAVILY_API_KEY`
+- `PERPLEXITY_AT_HOME_DEFAULT_MODEL` if you want to override `openai:gpt-5.4`
+
+Run each lane:
 
 ```bash
 pdm run perplexity-at-home quick-search "What is Tavily?"
 pdm run perplexity-at-home pro-search "What changed recently in Tavily's LangChain integration?"
 pdm run perplexity-at-home deep-research "Compare Tavily, Exa, and Perplexity for agent retrieval."
+```
+
+Turn on durable state:
+
+```bash
+make infra-up
+make infra-setup
+pdm run perplexity-at-home deep-research --persistent "What is Tavily?"
 ```
 
 Launch the dashboard:
@@ -139,32 +158,36 @@ pdm install -G dashboard
 pdm run perplexity-at-home dashboard
 ```
 
-## Persistence, Models, and Tracing
+The dashboard is built around workflow visibility: research output, sources,
+workflow graph, and run-state inspection. It is state-first today, not a
+token-stream demo surface pretending to be an agent runtime.
 
-Local persistence is wired through `src/perplexity_at_home/core/` and can back
-all three workflows with a LangGraph store plus checkpointer:
+## Settings, Persistence, and Runtime Surfaces
+
+- `src/perplexity_at_home/settings.py` owns OpenAI, Tavily, LangSmith, model, and nested Postgres settings.
+- `src/perplexity_at_home/core/` owns the async LangGraph store, checkpointer, and persistence wrapper.
+- `langgraph.json` exposes `quick_search`, `pro_search`, and `deep_research`, plus the custom store and checkpointer entrypoints.
+- Workflow-specific model overrides are supported with settings such as `PERPLEXITY_AT_HOME_QUICK_SEARCH_MODEL` and `PERPLEXITY_AT_HOME_DEEP_RESEARCH_RETRIEVAL_MODEL`.
+
+## Verified Paths
+
+Live runs were re-verified locally on **April 23, 2026** against real OpenAI,
+Tavily, and Postgres:
+
+- `quick-search` completed in memory.
+- `pro-search` completed in memory.
+- `deep-research` completed in memory.
+- `deep-research --persistent --setup-persistence` completed against Postgres.
+
+The repository now also includes a gated live E2E suite plus a GitHub Actions
+workflow for it:
 
 ```bash
-make infra-up
-make infra-setup
-pdm run perplexity-at-home deep-research --persistent "What is Tavily?"
+make test-e2e
 ```
 
-Important environment settings:
-
-- `OPENAI_API_KEY`
-- `TAVILY_API_KEY`
-- `PERPLEXITY_AT_HOME_DEFAULT_MODEL` and workflow-specific overrides
-- `PERPLEXITY_AT_HOME_POSTGRES__*`
-- `LANGSMITH_API_KEY`
-- `LANGCHAIN_TRACING_V2=true`
-
-All settings are loaded through `src/perplexity_at_home/settings.py` with
-Pydantic Settings and nested Postgres configuration.
-
-`langgraph.json` also points the LangGraph runtime at this repository's custom
-store and checkpointer entrypoints in `src/perplexity_at_home/core/store.py`
-and `src/perplexity_at_home/core/checkpoint.py`.
+The live suite is opt-in through `PERPLEXITY_AT_HOME_RUN_E2E=true` so normal CI
+stays fast and deterministic.
 
 ## Repository Layout
 
@@ -174,25 +197,22 @@ src/perplexity_at_home/
     quick_search/
     pro_search/
     deep_research/
-  core/                 # persistence helpers
-  dashboard/            # Streamlit launcher + service layer
-  tools/                # Tavily tool factories and normalization
-  settings.py           # typed app settings
+  core/                 # persistence + serializer helpers
+  dashboard/            # packaged Streamlit app
+  tools/                # Tavily factories and normalization
+  settings.py           # Pydantic settings + model selection
   cli.py                # package CLI
-docs/                   # MkDocs + Read the Docs source
-examples/               # runnable examples
+docs/                   # MkDocs + Read the Docs
+examples/               # runnable demos
 infra/                  # local Docker Compose
-tests/                  # unit and integration tests
+tests/                  # unit, integration, and gated live E2E tests
 ```
 
-## Docs, Releases, and Quality Gates
+## Docs, Release, and Quality Gates
 
-- Docs are built with MkDocs Material and published through Read the Docs.
-- GitHub Actions cover CI, docs, and tagged release automation.
-- `pdm build` produces the wheel and source distribution for publishing.
-- `make lint`, `make test`, and `make docs-build` are the main local quality gates.
+- Docs build with MkDocs Material and publish through Read the Docs.
+- GitHub Actions cover CI, docs, live E2E, and tagged releases.
+- `pdm build` produces the wheel and source distribution for PyPI.
+- `make lint`, `make test`, `make docs-build`, and `make release-check` are the main local gates.
 
-Current test coverage is strong for settings, builders, CLI wiring, persistence,
-dashboard normalization, and graph behavior. Live OpenAI, Tavily, and Postgres
-E2E runs are validated manually today; a full automated external-service E2E
-suite is still an active follow-up rather than a finished part of the package.
+Full package docs live at <https://perplexity-at-home.readthedocs.io/>.

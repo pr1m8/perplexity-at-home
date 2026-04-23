@@ -1,0 +1,65 @@
+name: Live E2E
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  live-e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: perplexity_at_home
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5442:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d perplexity_at_home"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+      LANGCHAIN_TRACING_V2: ${{ secrets.LANGCHAIN_TRACING_V2 || 'false' }}
+      LANGGRAPH_STRICT_MSGPACK: "true"
+      PERPLEXITY_AT_HOME_RUN_E2E: "true"
+      PERPLEXITY_AT_HOME_POSTGRES__HOST: localhost
+      PERPLEXITY_AT_HOME_POSTGRES__PORT: "5442"
+      PERPLEXITY_AT_HOME_POSTGRES__DATABASE: perplexity_at_home
+      PERPLEXITY_AT_HOME_POSTGRES__USER: postgres
+      PERPLEXITY_AT_HOME_POSTGRES__PASSWORD: postgres
+      PERPLEXITY_AT_HOME_POSTGRES__SSLMODE: disable
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
+
+      - name: Install test dependencies
+        run: pdm install -G test
+
+      - name: Run live E2E suite
+        run: pdm run pytest --no-cov -p no:rerunfailures -m e2e tests/test_live_e2e.py
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-e2e-reports
+          path: reports/
+          if-no-files-found: ignore

@@ -17,13 +17,23 @@ class DummyAsyncResource:
         self.setup_calls += 1
 
 
+class DummySettings:
+    def __init__(self) -> None:
+        self.runtime_environment_applied = False
+
+    def apply_runtime_environment(self) -> None:
+        self.runtime_environment_applied = True
+
+
 @pytest.mark.asyncio
 async def test_checkpoint_context_runs_setup(monkeypatch) -> None:
     resource = DummyAsyncResource()
+    settings = DummySettings()
 
     @asynccontextmanager
-    async def fake_from_conn_string(uri: str):
+    async def fake_from_conn_string(uri: str, *, serde):
         assert uri.startswith("postgresql://")
+        assert serde == "serde"
         yield resource
 
     monkeypatch.setattr(
@@ -36,11 +46,14 @@ async def test_checkpoint_context_runs_setup(monkeypatch) -> None:
         "get_checkpointer_uri",
         lambda: "postgresql://postgres:postgres@localhost:5442/perplexity_at_home?sslmode=disable",
     )
+    monkeypatch.setattr(checkpoint_module, "build_checkpointer_serde", lambda: "serde")
+    monkeypatch.setattr(checkpoint_module, "get_settings", lambda: settings)
 
     async with checkpoint_module.checkpoint_context(setup=True) as checkpointer:
         assert checkpointer is resource
 
     assert resource.setup_calls == 1
+    assert settings.runtime_environment_applied is True
 
 
 @pytest.mark.asyncio

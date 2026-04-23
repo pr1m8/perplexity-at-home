@@ -234,6 +234,10 @@ def _render_sidebar(  # pragma: no cover
     st.sidebar.markdown("---")
     st.sidebar.caption(workflow.description)
     st.sidebar.code(service.default_model_for_workflow(workflow), language=None)
+    st.sidebar.caption(
+        "This dashboard refreshes at workflow boundaries today and keeps the full "
+        "run state, citations, and graph view available for inspection."
+    )
 
     current_thread = _active_thread(workflow)
     with st.sidebar.expander("Thread details", expanded=False):
@@ -250,6 +254,8 @@ def _render_hero(  # pragma: no cover
     workflow: SearchWorkflow,
     thread: DashboardThreadRecord,
     history: list[DashboardTurnRecord],
+    *,
+    persistent: bool,
 ) -> None:
     """Render the dashboard header and workflow summary cards."""
     settings = get_settings()
@@ -271,11 +277,12 @@ def _render_hero(  # pragma: no cover
         unsafe_allow_html=True,
     )
 
-    metric_columns = st.columns(4)
+    metric_columns = st.columns(5)
     metric_columns[0].metric("Workflow", workflow.label)
     metric_columns[1].metric("Default model", service.default_model_for_workflow(workflow).removeprefix("openai:"))
     metric_columns[2].metric("Thread turns", str(thread.turn_count))
     metric_columns[3].metric("LangSmith tracing", "on" if tracing_enabled else "off")
+    metric_columns[4].metric("Run mode", "persistent" if persistent else "in-memory")
 
     card_left, card_mid, card_right = st.columns(3)
     card_left.markdown(
@@ -435,13 +442,17 @@ def main() -> None:  # pragma: no cover
     service = DashboardService()
     workflow, thread, persistent, setup_persistence, debug = _render_sidebar(service)
     turns = _thread_history(thread.thread_id)
-    _render_hero(service, workflow, thread, turns)
+    _render_hero(service, workflow, thread, turns, persistent=persistent)
 
     research_tab, sources_tab, graph_tab, state_tab = st.tabs(
         ["Research", "Sources", "Workflow Graph", "Run State"]
     )
 
     with research_tab:
+        st.caption(
+            "Runs render as completed workflow turns. Use Workflow Graph and Run State "
+            "to inspect the graph shape and normalized execution metadata."
+        )
         _render_history(turns)
         selected_prompt = _render_starter_prompts(workflow, turns)
 

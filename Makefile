@@ -20,7 +20,7 @@ endif
 
 .PHONY: \
 	infra-up infra-down infra-restart infra-logs infra-psql infra-status infra-destroy infra-setup \
-	lint test docs-build docs-serve build dashboard release-check
+	lint test test-e2e docs-build docs-serve build dashboard release-check
 
 infra-up:
 	$(COMPOSE) up -d
@@ -51,6 +51,9 @@ lint:
 
 test:
 	pdm run pytest
+
+test-e2e:
+	PERPLEXITY_AT_HOME_RUN_E2E=true pdm run pytest --no-cov -p no:rerunfailures -m e2e tests/test_live_e2e.py
 
 docs-build:
 	pdm run mkdocs build --strict
