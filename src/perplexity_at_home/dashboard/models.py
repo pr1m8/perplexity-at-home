@@ -31,10 +31,10 @@ class SearchWorkflow(StrEnum):
         """Return a short workflow description."""
         return {
             SearchWorkflow.QUICK: (
-                "Single-pass answer generation for direct questions where speed matters."
+                "Focused search, fetch, and summary for direct questions where speed matters."
             ),
             SearchWorkflow.PRO: (
-                "Planned multi-search synthesis for broader questions with a few angles."
+                "A broader search pass with refinement, decomposition, evidence reading, and synthesis."
             ),
             SearchWorkflow.DEEP: (
                 "Iterative planning, retrieval, reflection, and report synthesis."
@@ -64,22 +64,22 @@ class SearchWorkflow(StrEnum):
         """Return the major execution stages for the workflow."""
         return {
             SearchWorkflow.QUICK: (
-                "Scope the question",
-                "Run focused retrieval",
-                "Optionally inspect one source",
-                "Draft cited answer",
+                "Frame a focused query",
+                "Search the web",
+                "Fetch the best source",
+                "Summarize into a fast cited answer",
             ),
             SearchWorkflow.PRO: (
-                "Plan search set",
-                "Run parallel retrieval",
-                "Aggregate evidence",
-                "Synthesize answer",
+                "Check scope and refine if needed",
+                "Decompose into a few searches",
+                "Read and aggregate evidence",
+                "Synthesize the grounded answer",
             ),
             SearchWorkflow.DEEP: (
-                "Plan subquestions",
-                "Generate targeted queries",
-                "Retrieve evidence",
-                "Reflect on gaps",
+                "Scope and plan the research",
+                "Generate subquestions and queries",
+                "Retrieve, read, and extract evidence",
+                "Reflect on gaps and confidence",
                 "Write final report",
             ),
         }[self]
@@ -111,48 +111,40 @@ class SearchWorkflow(StrEnum):
         return {
             SearchWorkflow.QUICK: """
 flowchart TD
-    U[User question] --> A[quick_search_agent]
-    A --> C[Interpret scope and time constraints]
-    C --> Q[Generate one focused Tavily query]
-    Q --> S[tavily_search]
-    S --> D{Need a closer read?}
-    D -->|yes| X[tavily_extract]
-    D -->|no| F[Draft cited answer]
-    X --> F
-    F --> R[Structured quick answer]
+    U[User question] --> Q[Frame focused query]
+    Q --> S[Search the web]
+    S --> F[Fetch or extract the best source]
+    F --> M[Summarize the evidence]
+    M --> R[Structured quick answer]
 """.strip(),
             SearchWorkflow.PRO: """
 flowchart TD
-    U[User question] --> P[generate_query_plan]
-    P --> B[build_batch_search_calls]
-    B --> T[run_search_tools]
-    T --> A[aggregate_search_results]
-    A --> S[synthesize_answer]
-    S --> R[Markdown answer with citations]
+    U[User question] --> C[Complexity check]
+    C --> D{Need clarification or refinement?}
+    D -->|yes| R[Refine scope]
+    D -->|no| Q[Decompose question]
+    R --> Q
+    Q --> S[Run parallel searches]
+    S --> E[Read the strongest sources]
+    E --> A[Aggregate evidence]
+    A --> T[Synthesize answer]
+    T --> O[Markdown answer with citations]
 """.strip(),
             SearchWorkflow.DEEP: """
 flowchart TD
-    U[Original question] --> P[plan_research]
-    P -->|needs clarification| C[request_clarification]
-    P -->|ready| G[generate_query_plans]
+    U[Original question] --> S[Scope check]
+    S -->|needs clarification| C[Clarify request]
+    S -->|ready| P[Build research plan]
+    P --> G[Generate subquestions]
 
     subgraph Retrieval Loop
-        G --> R[run_retrieval]
-        R --> F[reflect_on_evidence]
-        F -->|enough evidence| A[synthesize_answer]
-        F -->|requery| RQ[prepare_requery_followup]
-        F -->|extract| EX[prepare_extract_followup]
-        F -->|map| MP[prepare_map_followup]
-        F -->|crawl| CR[prepare_crawl_followup]
-        F -->|research| RS[prepare_research_followup]
-        RQ --> R
-        EX --> R
-        MP --> R
-        CR --> R
-        RS --> R
+        G --> R[Search and retrieve]
+        R --> X[Read and extract evidence]
+        X --> F[Analyze gaps and confidence]
+        F -->|coverage incomplete| R
     end
 
-    A --> O[Report markdown + findings]
+    F -->|coverage sufficient| O[Report markdown + findings]
 """.strip(),
         }[self]
 

@@ -21,6 +21,8 @@ def test_search_workflow_metadata_is_populated() -> None:
     assert SearchWorkflow.QUICK.input_placeholder
     assert len(SearchWorkflow.PRO.stages) >= 3
     assert len(SearchWorkflow.DEEP.starter_questions) >= 3
+    assert "Summarize the evidence" in SearchWorkflow.QUICK.graph_mermaid
+    assert "Run parallel searches" in SearchWorkflow.PRO.graph_mermaid
     assert "flowchart" in SearchWorkflow.DEEP.graph_mermaid
 
 

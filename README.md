@@ -8,21 +8,55 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/perplexity-at-home)](https://pypi.org/project/perplexity-at-home/)
 [![License](https://img.shields.io/github/license/pr1m8/perplexity-at-home)](LICENSE)
 
-`perplexity-at-home` is a packaged research runtime built with LangGraph, Tavily,
-OpenAI, and optional Postgres persistence. It ships three distinct research
-lanes, defaults to `openai:gpt-5.4`, exposes a packaged Streamlit dashboard,
-and keeps runtime configuration centralized in Pydantic Settings.
+`perplexity-at-home` is an open-source, Perplexity-style research runtime built
+with LangGraph, Tavily, OpenAI, and optional Postgres persistence. It ships
+three distinct research modes, defaults to `openai:gpt-5.4`, exposes a packaged
+Streamlit dashboard, and keeps runtime configuration centralized in Pydantic
+Settings.
 
 The point of the package is simple: quick answers, broader synthesis, and real
 deep research should not be the same graph.
 
+Think of the package as a ladder:
+`quick-search -> pro-search -> deep-research`.
+Each lane adds more planning, source coverage, and synthesis depth.
+
+## Why This Exists
+
+- `quick-search` for fast cited answers
+- `pro-search` for broader multi-source synthesis
+- `deep-research` for iterative report-style investigation
+- one package surface for CLI, dashboard, and LangGraph runtime entrypoints
+- optional Postgres-backed persistence for long-running threads and reloadable state
+
+## One-Minute Tour
+
+```bash
+make setup
+make quick QUESTION="What changed in LangGraph recently?"
+make pro QUESTION="Compare Tavily and Exa for agent retrieval."
+make deep QUESTION="Research the tradeoffs between Tavily, Exa, and Perplexity."
+make dashboard
+```
+
 ## Research Lanes
 
-| Workflow        | Shape                                      | Best for                     | Output                                      |
-| --------------- | ------------------------------------------ | ---------------------------- | ------------------------------------------- |
-| `quick-search`  | single answering agent with Tavily tools   | fast factual questions       | concise markdown answer with citations      |
-| `pro-search`    | explicit planning and aggregation graph    | broader web-backed synthesis | structured markdown answer                  |
-| `deep-research` | multi-agent LangGraph with reflection loop | report-style investigation   | long-form brief with evidence and citations |
+| Workflow        | Shape                                                           | Best for                     | Output                                      |
+| --------------- | --------------------------------------------------------------- | ---------------------------- | ------------------------------------------- |
+| `quick-search`  | `query -> search -> fetch -> summarize -> answer`               | fast factual questions       | concise markdown answer with citations      |
+| `pro-search`    | `clarify -> decompose -> parallel search -> read -> synthesize` | broader web-backed synthesis | structured markdown answer                  |
+| `deep-research` | `scope -> plan -> retrieve/read/analyze -> loop -> report`      | report-style investigation   | long-form brief with evidence and citations |
+
+## Example Questions
+
+- `quick-search`: `What changed in LangGraph recently?`
+- `pro-search`: `Compare Tavily and Exa for agent retrieval.`
+- `deep-research`: `Research best practices for packaging a multi-workflow research agent.`
+
+Runnable demos also live under [`examples/`](examples/), including
+[`examples/quick_search_demo.py`](examples/quick_search_demo.py),
+[`examples/pro_search_answer_demo.py`](examples/pro_search_answer_demo.py), and
+[`examples/deep_research_demo.py`](examples/deep_research_demo.py).
 
 ## System Map
 
@@ -60,65 +94,69 @@ flowchart LR
 
 ## Workflow Graphs
 
+The diagrams below are the public workflow shapes used by the package docs and
+dashboard. They intentionally show the product-level flow, not every internal
+node name.
+
 ### Quick Search
 
 ```mermaid
 flowchart LR
-    Q[Question] --> A[quick_search_agent]
-    A --> T[Tavily quick bundle]
-    T --> A
-    A --> R[Structured answer]
+    Q[Question] --> QUERY[Frame focused query]
+    QUERY --> SEARCH[Search the web]
+    SEARCH --> FETCH[Fetch or extract the best source]
+    FETCH --> SUMMARIZE[Summarize the evidence]
+    SUMMARIZE --> ANSWER[Return a fast cited answer]
 ```
 
-`quick-search` stays intentionally thin. It is the fastest lane and favors a
-clean answer path over orchestration depth.
+`quick-search` stays intentionally thin. The implementation is still a compact
+single-agent surface, but the mental model is shallow retrieval:
+`query -> search -> fetch -> summarize -> answer`.
 
 ### Pro Search
 
 ```mermaid
-flowchart LR
-    Q[Question] --> P[generate_query_plan]
-    P --> B[build_batch_search_calls]
-    B --> T[run_search_tools]
-    T --> A[aggregate_search_results]
-    A --> S[synthesize_answer]
-    S --> R[Markdown answer]
+flowchart TD
+    Q[Question] --> CHECK[Complexity check]
+    CHECK --> CLARIFY{Need clarification or refinement?}
+    CLARIFY -->|yes| REFINE[Refine scope]
+    CLARIFY -->|no| DECOMP[Decompose question]
+    REFINE --> DECOMP
+    DECOMP --> SEARCH[Run parallel searches]
+    SEARCH --> READ[Read the strongest sources]
+    READ --> AGGREGATE[Aggregate evidence]
+    AGGREGATE --> SYNTHESIZE[Synthesize grounded answer]
+    SYNTHESIZE --> ANSWER[Markdown answer with citations]
 ```
 
-`pro-search` is the middle lane: plan a small query set, execute Tavily calls,
-normalize evidence, then synthesize a grounded answer.
+`pro-search` is the middle lane. In code today it is a tight deterministic
+graph around planning, batched Tavily execution, aggregation, and synthesis.
+At the package level, the intended flow is:
+`query -> complexity/refinement -> decomposition -> parallel search -> read -> aggregate -> synthesize`.
 
 ### Deep Research
 
 ```mermaid
 flowchart TD
-    Q[Question] --> PLAN[plan_research]
-    PLAN -->|needs clarification| CLARIFY[request_clarification]
-    PLAN -->|scoped| QUERY[generate_query_plans]
+    Q[Question] --> SCOPE[Scope check]
+    SCOPE -->|needs clarification| CLARIFY[Clarify request]
+    SCOPE -->|ready| PLAN[Build research plan]
+    PLAN --> SUBQ[Generate subquestions]
 
-    QUERY --> RETRIEVE[run_retrieval]
-    RETRIEVE --> EVIDENCE[(evidence_items + open_gaps)]
-    EVIDENCE --> REFLECT[reflect_on_evidence]
+    subgraph Retrieval Loop
+        SUBQ --> SEARCH[Search and retrieve]
+        SEARCH --> READ[Read and extract evidence]
+        READ --> ANALYZE[Analyze gaps and confidence]
+        ANALYZE -->|coverage incomplete| SEARCH
+    end
 
-    REFLECT -->|sufficient| ANSWER[synthesize_answer]
-    REFLECT -->|requery| RQ[prepare_requery_followup]
-    REFLECT -->|extract| EX[prepare_extract_followup]
-    REFLECT -->|map| MAP[prepare_map_followup]
-    REFLECT -->|crawl| CR[prepare_crawl_followup]
-    REFLECT -->|research| RS[prepare_research_followup]
-
-    RQ --> RETRIEVE
-    EX --> RETRIEVE
-    MAP --> RETRIEVE
-    CR --> RETRIEVE
-    RS --> RETRIEVE
-
-    ANSWER --> REPORT[Report markdown + citations]
+    ANALYZE -->|coverage sufficient| REPORT[Write final report]
 ```
 
-`deep-research` is the real DAG-heavy lane. It scopes the job, decomposes it,
-routes retrieval strategy, critiques coverage, and loops until the evidence is
-good enough or the iteration budget is exhausted.
+`deep-research` is the real DAG-heavy lane. The concrete graph routes follow-up
+work through retrieval strategies such as `requery`, `extract`, `map`,
+`crawl`, and `research`, but the public shape is the iterative research loop
+from the design notes: scope, plan, search, read, analyze, repeat, then write.
 
 ## How To Run
 
@@ -160,6 +198,14 @@ Launch the dashboard:
 
 ```bash
 make dashboard
+```
+
+You can also use the packaged CLI directly:
+
+```bash
+pdm run perplexity-at-home quick-search "What is Tavily?"
+pdm run perplexity-at-home pro-search "Compare Tavily and Exa for agent retrieval."
+pdm run perplexity-at-home deep-research "Research the current LangGraph persistence story."
 ```
 
 The dashboard is built around workflow visibility: research output, sources,
@@ -240,8 +286,29 @@ tests/                  # unit, integration, and gated live E2E tests
 ## Docs, Release, and Quality Gates
 
 - Docs build with MkDocs Material and publish through Read the Docs.
-- GitHub Actions cover CI, docs, live E2E, and tagged releases.
+- GitHub Actions cover CI, docs, live E2E, and release publishing.
 - `pdm build` produces the wheel and source distribution for PyPI.
 - `make lint`, `make test`, `make docs-build`, and `make release-check` are the main local gates.
+
+## Releasing To PyPI
+
+The canonical release path is a version tag from `main`:
+
+```bash
+git tag -a v0.1.0 -m "v0.1.0"
+git push origin v0.1.0
+```
+
+The `Release` workflow then:
+
+- installs the locked environment
+- runs Ruff, pytest, and the docs build
+- builds the wheel and sdist
+- runs `twine check`
+- publishes to PyPI through GitHub trusted publishing
+- creates the matching GitHub release
+
+There is also a manual `workflow_dispatch` path for release preflight checks
+when you want to validate the release job without pushing a tag.
 
 Full package docs live at <https://perplexity-at-home.readthedocs.io/>.
