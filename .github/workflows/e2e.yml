@@ -49,10 +49,16 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8
+
       - name: Set up PDM
         uses: pdm-project/setup-pdm@v4
         with:
           version: 2.26.8
+
+      - name: Configure PDM to use uv
+        run: pdm config use_uv true
 
       - name: Install test dependencies
         run: pdm sync -G test
