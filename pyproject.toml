@@ -46,6 +46,7 @@ text = "MIT"
 Homepage = "https://github.com/pr1m8/perplexity-at-home"
 Repository = "https://github.com/pr1m8/perplexity-at-home"
 Issues = "https://github.com/pr1m8/perplexity-at-home/issues"
+Documentation = "https://perplexity-at-home.readthedocs.io/"
 
 [project.scripts]
 perplexity-at-home = "perplexity_at_home.cli:main"
@@ -252,6 +253,13 @@ jupyter = [
     "jupyter>=1.0",
     "notebook",
     "jupyterlab",
+]
+
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.14",
+    "mkdocstrings[python]>=0.30.1",
+    "pymdown-extensions>=10.16.1",
 ]
 
 # -------------------------

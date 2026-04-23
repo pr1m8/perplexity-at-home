@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: perplexity-at-home-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PERPLEXITY_AT_HOME_POSTGRES__DATABASE}
+      POSTGRES_USER: ${PERPLEXITY_AT_HOME_POSTGRES__USER}
+      POSTGRES_PASSWORD: ${PERPLEXITY_AT_HOME_POSTGRES__PASSWORD}
+    ports:
+      - "${PERPLEXITY_AT_HOME_POSTGRES__PORT}:5432"
+    volumes:
+      - perplexity_at_home_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${PERPLEXITY_AT_HOME_POSTGRES__USER} -d ${PERPLEXITY_AT_HOME_POSTGRES__DATABASE}
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  perplexity_at_home_postgres_data:

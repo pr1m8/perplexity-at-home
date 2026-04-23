@@ -1,0 +1,41 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions: {}
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
+
+      - name: Install docs dependencies
+        run: pdm install -G docs
+
+      - name: Build docs
+        run: pdm run mkdocs build --strict
+
+      - name: Upload site artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: site/
+          if-no-files-found: ignore

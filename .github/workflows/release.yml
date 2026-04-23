@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
+
+      - name: Install release dependencies
+        run: pdm install -G test -G lint -G docs
+
+      - name: Run Ruff
+        run: pdm run ruff check src tests
+
+      - name: Run pytest
+        run: pdm run pytest
+
+      - name: Build docs
+        run: pdm run mkdocs build --strict
+
+      - name: Build distributions
+        run: pdm build
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/*

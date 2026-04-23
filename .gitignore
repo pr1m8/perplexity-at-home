@@ -216,3 +216,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 .pdm-home/
+
+# Local experiments and generated artifacts
+reports/
+scripts/
