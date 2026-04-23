@@ -33,9 +33,10 @@ from perplexity_at_home.agents.pro_search.query_agent.context import QueryAgentC
 from perplexity_at_home.agents.pro_search.query_agent.models import ProSearchQueryPlan
 from perplexity_at_home.agents.pro_search.query_agent.prompts import query_generator_prompt
 from perplexity_at_home.agents.pro_search.query_agent.state import QueryAgentState
+from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_query_generator_agent(model: str = "openai:gpt-4.1") -> Any:
+def build_query_generator_agent(model: str | None = None) -> Any:
     """Build the pro-search query-generation agent.
 
     Args:
@@ -54,9 +55,11 @@ def build_query_generator_agent(model: str = "openai:gpt-4.1") -> Any:
         True
     """
     memory = MemorySaver()
+    settings = get_settings()
+    resolved_model = resolve_model(model, settings.resolved_pro_search_query_model)
 
     return create_agent(
-        model=model,
+        model=resolved_model,
         tools=[],
         middleware=[query_generator_prompt],
         context_schema=QueryAgentContext,

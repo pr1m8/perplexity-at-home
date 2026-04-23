@@ -34,10 +34,11 @@ from perplexity_at_home.agents.quick_search.context import QuickSearchContext
 from perplexity_at_home.agents.quick_search.models import QuickSearchAnswer
 from perplexity_at_home.agents.quick_search.prompts import build_quick_search_system_prompt
 from perplexity_at_home.agents.quick_search.state import QuickSearchState
+from perplexity_at_home.settings import get_settings, resolve_model
 from perplexity_at_home.tools.tavily import build_quick_bundle
 
 
-def build_quick_search_agent() -> object:
+def build_quick_search_agent(model: str | None = None) -> object:
     """Build the main quick-search agent.
 
     The resulting agent is configured for fast, citation-aware Tavily-backed
@@ -58,9 +59,11 @@ def build_quick_search_agent() -> object:
     """
     memory = MemorySaver()
     tools = list(build_quick_bundle().values())
+    settings = get_settings()
+    resolved_model = resolve_model(model, settings.resolved_quick_search_model)
 
     return create_agent(
-        model="openai:gpt-4.1",
+        model=resolved_model,
         tools=tools,
         system_prompt=build_quick_search_system_prompt(),
         context_schema=QuickSearchContext,

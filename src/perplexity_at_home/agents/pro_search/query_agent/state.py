@@ -29,7 +29,7 @@ Examples:
 
 from __future__ import annotations
 
-from typing_extensions import NotRequired
+from typing import NotRequired
 
 from langchain.agents import AgentState
 

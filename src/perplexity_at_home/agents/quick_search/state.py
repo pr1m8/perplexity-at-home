@@ -35,11 +35,9 @@ Examples:
 
 from __future__ import annotations
 
-from typing import Any, Literal
-from typing_extensions import NotRequired
+from typing import Any, Literal, NotRequired
 
 from langchain.agents import AgentState
-
 
 type SufficiencyVerdict = Literal["answered", "partially_answered", "not_answered"]
 

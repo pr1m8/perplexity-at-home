@@ -57,7 +57,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
 type QueryIntent = Literal[
     "direct",
     "broadening",

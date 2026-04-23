@@ -44,9 +44,10 @@ from langgraph.checkpoint.memory import MemorySaver
 from perplexity_at_home.agents.pro_search.answer_agent.models import ProSearchAnswer
 from perplexity_at_home.agents.pro_search.answer_agent.prompts import answer_agent_prompt
 from perplexity_at_home.agents.pro_search.context import ProSearchContext
+from perplexity_at_home.settings import get_settings, resolve_model
 
 
-def build_answer_agent(model: str = "openai:gpt-4.1") -> Any:
+def build_answer_agent(model: str | None = None) -> Any:
     """Build the pro-search answer-synthesis child agent.
 
     Args:
@@ -65,9 +66,11 @@ def build_answer_agent(model: str = "openai:gpt-4.1") -> Any:
         True
     """
     memory = MemorySaver()
+    settings = get_settings()
+    resolved_model = resolve_model(model, settings.resolved_pro_search_answer_model)
 
     return create_agent(
-        model=model,
+        model=resolved_model,
         tools=[],
         middleware=[answer_agent_prompt],
         context_schema=ProSearchContext,

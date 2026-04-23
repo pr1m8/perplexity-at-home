@@ -1,0 +1,8 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "deep_research": "./src/perplexity_at_home/agents/deep_research/graph.py:build_deep_research_graph",
+    "pro_search": "./src/perplexity_at_home/agents/pro_search/graph.py:build_pro_search_graph"
+  },
+  "env": "./.env"
+}

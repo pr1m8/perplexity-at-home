@@ -606,7 +606,6 @@ addopts = [
     "--cov-report=html:reports/htmlcov",
     "--junitxml=reports/junit.xml",
     "--html-output=reports/report_output",
-    "--json-report=reports/report_output/final_report.json",
     "--should-open-report=never",
     "--capture-screenshots=failed",
 ]
