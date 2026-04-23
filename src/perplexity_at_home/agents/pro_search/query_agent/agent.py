@@ -33,7 +33,7 @@ from perplexity_at_home.agents.pro_search.query_agent.context import QueryAgentC
 from perplexity_at_home.agents.pro_search.query_agent.models import ProSearchQueryPlan
 from perplexity_at_home.agents.pro_search.query_agent.prompts import query_generator_prompt
 from perplexity_at_home.agents.pro_search.query_agent.state import QueryAgentState
-from perplexity_at_home.settings import get_settings, resolve_model
+from perplexity_at_home.settings import get_settings
 
 
 def build_query_generator_agent(
@@ -62,7 +62,10 @@ def build_query_generator_agent(
     """
     resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
-    resolved_model = resolve_model(model, settings.resolved_pro_search_query_model)
+    resolved_model = settings.build_chat_model(
+        settings.resolved_pro_search_query_model,
+        explicit_model=model,
+    )
 
     return create_agent(
         model=resolved_model,

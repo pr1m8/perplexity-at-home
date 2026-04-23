@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from perplexity_at_home.settings import AppSettings
 from perplexity_at_home.tools.tavily import bundles, factories, normalize
 
 
@@ -36,6 +37,27 @@ def test_normalize_search_payload_and_answer_extraction() -> None:
 
 def test_factories_build_tools_from_presets(monkeypatch) -> None:
     captured: dict[str, Any] = {}
+    settings = AppSettings(_env_file=None, tavily_api_key="test-tavily-key")
+
+    class DummySearchWrapper:
+        def __init__(self, *, tavily_api_key) -> None:
+            captured["search_wrapper"] = tavily_api_key
+
+    class DummyExtractWrapper:
+        def __init__(self, *, tavily_api_key) -> None:
+            captured["extract_wrapper"] = tavily_api_key
+
+    class DummyMapWrapper:
+        def __init__(self, *, tavily_api_key) -> None:
+            captured["map_wrapper"] = tavily_api_key
+
+    class DummyCrawlWrapper:
+        def __init__(self, *, tavily_api_key) -> None:
+            captured["crawl_wrapper"] = tavily_api_key
+
+    class DummyResearchWrapper:
+        def __init__(self, *, tavily_api_key) -> None:
+            captured["research_wrapper"] = tavily_api_key
 
     class DummySearch:
         def __init__(self, **kwargs: Any) -> None:
@@ -50,16 +72,16 @@ def test_factories_build_tools_from_presets(monkeypatch) -> None:
             captured["research"] = kwargs
 
     class DummyMap:
-        def __init__(self) -> None:
-            captured["map"] = True
+        def __init__(self, **kwargs: Any) -> None:
+            captured["map"] = kwargs
 
     class DummyCrawl:
-        def __init__(self) -> None:
-            captured["crawl"] = True
+        def __init__(self, **kwargs: Any) -> None:
+            captured["crawl"] = kwargs
 
     class DummyGetResearch:
-        def __init__(self) -> None:
-            captured["get_research"] = True
+        def __init__(self, **kwargs: Any) -> None:
+            captured["get_research"] = kwargs
 
     monkeypatch.setattr(factories, "TavilySearch", DummySearch)
     monkeypatch.setattr(factories, "TavilyExtract", DummyExtract)
@@ -67,6 +89,12 @@ def test_factories_build_tools_from_presets(monkeypatch) -> None:
     monkeypatch.setattr(factories, "TavilyMap", DummyMap)
     monkeypatch.setattr(factories, "TavilyCrawl", DummyCrawl)
     monkeypatch.setattr(factories, "TavilyGetResearch", DummyGetResearch)
+    monkeypatch.setattr(factories, "TavilySearchAPIWrapper", DummySearchWrapper)
+    monkeypatch.setattr(factories, "TavilyExtractAPIWrapper", DummyExtractWrapper)
+    monkeypatch.setattr(factories, "TavilyMapAPIWrapper", DummyMapWrapper)
+    monkeypatch.setattr(factories, "TavilyCrawlAPIWrapper", DummyCrawlWrapper)
+    monkeypatch.setattr(factories, "TavilyResearchAPIWrapper", DummyResearchWrapper)
+    monkeypatch.setattr(factories, "get_settings", lambda: settings)
 
     factories.build_search_tool()
     factories.build_pro_search_tool()
@@ -78,11 +106,19 @@ def test_factories_build_tools_from_presets(monkeypatch) -> None:
     factories.build_get_research_tool()
 
     assert captured["search"]["max_results"] == factories.PRO_SEARCH_PRESET.max_results
+    assert captured["search"]["api_wrapper"].__class__ is DummySearchWrapper
     assert captured["extract"]["extract_depth"] == factories.PRO_EXTRACT_PRESET.extract_depth
+    assert captured["extract"]["apiwrapper"].__class__ is DummyExtractWrapper
     assert captured["research"]["model"] == factories.DEEP_RESEARCH_PRESET.model
-    assert captured["map"] is True
-    assert captured["crawl"] is True
-    assert captured["get_research"] is True
+    assert captured["research"]["api_wrapper"].__class__ is DummyResearchWrapper
+    assert captured["map"]["api_wrapper"].__class__ is DummyMapWrapper
+    assert captured["crawl"]["api_wrapper"].__class__ is DummyCrawlWrapper
+    assert captured["get_research"]["api_wrapper"].__class__ is DummyResearchWrapper
+    assert captured["search_wrapper"] == settings.require_tavily_api_key()
+    assert captured["extract_wrapper"] == settings.require_tavily_api_key()
+    assert captured["map_wrapper"] == settings.require_tavily_api_key()
+    assert captured["crawl_wrapper"] == settings.require_tavily_api_key()
+    assert captured["research_wrapper"] == settings.require_tavily_api_key()
 
 
 def test_bundles_group_expected_tools(monkeypatch) -> None:

@@ -35,7 +35,7 @@ from perplexity_at_home.agents.deep_research.reflection_agent.models import (
 from perplexity_at_home.agents.deep_research.reflection_agent.prompts import (
     reflection_prompt,
 )
-from perplexity_at_home.settings import get_settings, resolve_model
+from perplexity_at_home.settings import get_settings
 
 
 def build_reflection_agent(
@@ -63,7 +63,10 @@ def build_reflection_agent(
     """
     resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
-    resolved_model = resolve_model(model, settings.resolved_deep_research_reflection_model)
+    resolved_model = settings.build_chat_model(
+        settings.resolved_deep_research_reflection_model,
+        explicit_model=model,
+    )
 
     return create_agent(
         model=resolved_model,

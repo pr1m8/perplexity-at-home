@@ -36,7 +36,7 @@ from perplexity_at_home.agents.deep_research.retrieval_agent.models import (
 from perplexity_at_home.agents.deep_research.retrieval_agent.prompts import (
     retrieval_agent_prompt,
 )
-from perplexity_at_home.settings import get_settings, resolve_model
+from perplexity_at_home.settings import get_settings
 from perplexity_at_home.tools.tavily import (
     build_crawl_tool,
     build_extract_tool,
@@ -72,7 +72,10 @@ def build_retrieval_agent(
     """
     resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
-    resolved_model = resolve_model(model, settings.resolved_deep_research_retrieval_model)
+    resolved_model = settings.build_chat_model(
+        settings.resolved_deep_research_retrieval_model,
+        explicit_model=model,
+    )
 
     tools = [
         build_search_tool(),

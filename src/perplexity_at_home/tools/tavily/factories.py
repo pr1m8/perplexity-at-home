@@ -24,7 +24,15 @@ from langchain_tavily import (
     TavilyResearch,
     TavilySearch,
 )
+from langchain_tavily._utilities import (
+    TavilyCrawlAPIWrapper,
+    TavilyExtractAPIWrapper,
+    TavilyMapAPIWrapper,
+    TavilyResearchAPIWrapper,
+    TavilySearchAPIWrapper,
+)
 
+from perplexity_at_home.settings import get_settings
 from perplexity_at_home.tools.tavily.presets import (
     DEEP_RESEARCH_PRESET,
     PRO_EXTRACT_PRESET,
@@ -48,12 +56,16 @@ def build_search_tool(
     Returns:
         A configured ``TavilySearch`` tool.
     """
+    settings = get_settings()
     return TavilySearch(
         max_results=preset.max_results,
         topic=preset.topic,
         search_depth=preset.search_depth,
         include_answer=preset.include_answer,
         include_raw_content=preset.include_raw_content,
+        api_wrapper=TavilySearchAPIWrapper(
+            tavily_api_key=settings.require_tavily_api_key(),
+        ),
     )
 
 
@@ -77,9 +89,13 @@ def build_extract_tool(
     Returns:
         A configured ``TavilyExtract`` tool.
     """
+    settings = get_settings()
     return TavilyExtract(
         extract_depth=preset.extract_depth,
         include_images=preset.include_images,
+        apiwrapper=TavilyExtractAPIWrapper(
+            tavily_api_key=settings.require_tavily_api_key(),
+        ),
     )
 
 
@@ -98,7 +114,12 @@ def build_map_tool() -> TavilyMap:
     Returns:
         A configured ``TavilyMap`` tool.
     """
-    return TavilyMap()
+    settings = get_settings()
+    return TavilyMap(
+        api_wrapper=TavilyMapAPIWrapper(
+            tavily_api_key=settings.require_tavily_api_key(),
+        )
+    )
 
 
 def build_crawl_tool() -> TavilyCrawl:
@@ -107,7 +128,12 @@ def build_crawl_tool() -> TavilyCrawl:
     Returns:
         A configured ``TavilyCrawl`` tool.
     """
-    return TavilyCrawl()
+    settings = get_settings()
+    return TavilyCrawl(
+        api_wrapper=TavilyCrawlAPIWrapper(
+            tavily_api_key=settings.require_tavily_api_key(),
+        )
+    )
 
 
 def build_research_tool(
@@ -121,11 +147,15 @@ def build_research_tool(
     Returns:
         A configured ``TavilyResearch`` tool.
     """
+    settings = get_settings()
     return TavilyResearch(
         model=preset.model,
         citation_format=preset.citation_format,
         stream=preset.stream,
         output_schema=preset.output_schema,
+        api_wrapper=TavilyResearchAPIWrapper(
+            tavily_api_key=settings.require_tavily_api_key(),
+        ),
     )
 
 
@@ -135,4 +165,9 @@ def build_get_research_tool() -> TavilyGetResearch:
     Returns:
         A configured ``TavilyGetResearch`` tool.
     """
-    return TavilyGetResearch()
+    settings = get_settings()
+    return TavilyGetResearch(
+        api_wrapper=TavilyResearchAPIWrapper(
+            tavily_api_key=settings.require_tavily_api_key(),
+        )
+    )

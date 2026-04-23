@@ -20,7 +20,11 @@ class DummyMemorySaver:
 
 
 def _default_settings() -> AppSettings:
-    return AppSettings(_env_file=None)
+    return AppSettings(
+        _env_file=None,
+        openai_api_key="test-openai-key",
+        tavily_api_key="test-tavily-key",
+    )
 
 
 def _capture_agent_kwargs(captured: dict[str, Any], result: str) -> Any:
@@ -46,7 +50,8 @@ def test_quick_search_builder_uses_configured_model(monkeypatch) -> None:
     result = quick_search_agent.build_quick_search_agent()
 
     assert result == "quick-agent"
-    assert captured["model"] == "openai:gpt-5.4"
+    assert type(captured["model"]).__name__ == "ChatOpenAI"
+    assert captured["model"].model_name == "gpt-5.4"
     assert captured["tools"] == ["tool"]
 
 

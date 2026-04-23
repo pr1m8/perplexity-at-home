@@ -44,7 +44,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from perplexity_at_home.agents.pro_search.answer_agent.models import ProSearchAnswer
 from perplexity_at_home.agents.pro_search.answer_agent.prompts import answer_agent_prompt
 from perplexity_at_home.agents.pro_search.context import ProSearchContext
-from perplexity_at_home.settings import get_settings, resolve_model
+from perplexity_at_home.settings import get_settings
 
 
 def build_answer_agent(
@@ -73,7 +73,10 @@ def build_answer_agent(
     """
     resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
-    resolved_model = resolve_model(model, settings.resolved_pro_search_answer_model)
+    resolved_model = settings.build_chat_model(
+        settings.resolved_pro_search_answer_model,
+        explicit_model=model,
+    )
 
     return create_agent(
         model=resolved_model,

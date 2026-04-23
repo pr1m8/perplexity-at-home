@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+import os
+from typing import Any, Literal
 from urllib.parse import quote_plus
 
+from langchain.chat_models.base import init_chat_model
 from pydantic import AliasChoices, BaseModel, Field, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -212,6 +214,63 @@ class AppSettings(BaseSettings):
     def resolved_deep_research_answer_model(self) -> str:
         """Return the configured deep-research answer model."""
         return self.deep_research_answer_model or self.deep_research_model or self.default_model
+
+    def require_openai_api_key(self) -> SecretStr:
+        """Return the configured OpenAI API key or raise a clear error."""
+        if self.openai_api_key is None:
+            raise RuntimeError(
+                "OpenAI API key is required. Set OPENAI_API_KEY or "
+                "PERPLEXITY_AT_HOME_OPENAI_API_KEY."
+            )
+        return self.openai_api_key
+
+    def require_tavily_api_key(self) -> SecretStr:
+        """Return the configured Tavily API key or raise a clear error."""
+        if self.tavily_api_key is None:
+            raise RuntimeError(
+                "Tavily API key is required. Set TAVILY_API_KEY or "
+                "PERPLEXITY_AT_HOME_TAVILY_API_KEY."
+            )
+        return self.tavily_api_key
+
+    def apply_runtime_environment(self) -> None:
+        """Export runtime-facing environment variables from loaded settings."""
+        os.environ["LANGGRAPH_STRICT_MSGPACK"] = str(self.langgraph_strict_msgpack).lower()
+        os.environ["LANGCHAIN_TRACING_V2"] = str(self.langchain_tracing_v2).lower()
+
+        if self.langchain_project:
+            os.environ["LANGCHAIN_PROJECT"] = self.langchain_project
+
+        if self.openai_api_key is not None:
+            os.environ["OPENAI_API_KEY"] = self.openai_api_key.get_secret_value()
+
+        if self.tavily_api_key is not None:
+            os.environ["TAVILY_API_KEY"] = self.tavily_api_key.get_secret_value()
+
+        if self.langsmith_api_key is not None:
+            os.environ["LANGSMITH_API_KEY"] = self.langsmith_api_key.get_secret_value()
+
+    def build_chat_model(
+        self,
+        configured_model: str,
+        *,
+        explicit_model: str | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Build a concrete LangChain chat model from settings."""
+        self.apply_runtime_environment()
+        resolved_model = resolve_model(explicit_model, configured_model)
+        provider, separator, model_name = resolved_model.partition(":")
+
+        if separator and provider == "openai":
+            return init_chat_model(
+                model_name,
+                model_provider=provider,
+                api_key=self.require_openai_api_key(),
+                **kwargs,
+            )
+
+        return init_chat_model(resolved_model, **kwargs)
 
 
 @lru_cache(maxsize=1)

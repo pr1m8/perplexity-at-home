@@ -33,7 +33,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from perplexity_at_home.agents.deep_research.context import DeepResearchContext
 from perplexity_at_home.agents.deep_research.planner_agent.models import PlannerOutput
 from perplexity_at_home.agents.deep_research.planner_agent.prompts import planner_prompt
-from perplexity_at_home.settings import get_settings, resolve_model
+from perplexity_at_home.settings import get_settings
 
 
 def build_planner_agent(
@@ -61,7 +61,10 @@ def build_planner_agent(
     """
     resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
-    resolved_model = resolve_model(model, settings.resolved_deep_research_planner_model)
+    resolved_model = settings.build_chat_model(
+        settings.resolved_deep_research_planner_model,
+        explicit_model=model,
+    )
 
     return create_agent(
         model=resolved_model,

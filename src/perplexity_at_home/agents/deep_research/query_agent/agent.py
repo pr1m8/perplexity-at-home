@@ -36,7 +36,7 @@ from perplexity_at_home.agents.deep_research.query_agent.models import (
 from perplexity_at_home.agents.deep_research.query_agent.prompts import (
     query_agent_prompt,
 )
-from perplexity_at_home.settings import get_settings, resolve_model
+from perplexity_at_home.settings import get_settings
 
 
 def build_query_agent(
@@ -64,7 +64,10 @@ def build_query_agent(
     """
     resolved_checkpointer = checkpointer or MemorySaver()
     settings = get_settings()
-    resolved_model = resolve_model(model, settings.resolved_deep_research_query_model)
+    resolved_model = settings.build_chat_model(
+        settings.resolved_deep_research_query_model,
+        explicit_model=model,
+    )
 
     return create_agent(
         model=resolved_model,
