@@ -1,47 +1,40 @@
-name: Docs
-
+---
+# .github/workflows/docs.yml
+name: Docs CI
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths: [docs/**, mkdocs.yml, pyproject.toml, pdm.lock, src/**]
   pull_request:
-
-permissions: {}
+    paths: [docs/**, mkdocs.yml, pyproject.toml, pdm.lock, src/**]
+permissions:
+  contents: read
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 jobs:
   build-docs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-
       - name: Set up uv
         uses: astral-sh/setup-uv@v8
-
       - name: Set up PDM
         uses: pdm-project/setup-pdm@v4
         with:
           version: 2.26.8
-
       - name: Configure PDM to use uv
         run: pdm config use_uv true
-
       - name: Install docs dependencies
         run: pdm sync -G docs
-
       - name: Build docs
         run: pdm run mkdocs build --strict
-
       - name: Upload site artifact
         if: always()
         uses: actions/upload-artifact@v4
