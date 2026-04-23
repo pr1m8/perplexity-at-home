@@ -111,11 +111,11 @@ writing the final brief. The top-level graph lives in
 
 The package exposes the same workflows through three entry points:
 
-| Surface                        | What it does                                                                 | Notes                                          |
-| ------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------- |
-| `perplexity-at-home`           | CLI for `quick-search`, `pro-search`, `deep-research`, and persistence setup | implemented in `src/perplexity_at_home/cli.py` |
-| `perplexity-at-home-dashboard` | packaged Streamlit app with workflow switching and thread-aware runs         | optional `dashboard` dependency group          |
-| `langgraph.json`               | LangGraph runtime entrypoints for `deep_research` and `pro_search`           | useful for LangGraph dev/server flows          |
+| Surface                        | What it does                                                                        | Notes                                          |
+| ------------------------------ | ----------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `perplexity-at-home`           | CLI for `quick-search`, `pro-search`, `deep-research`, and persistence setup        | implemented in `src/perplexity_at_home/cli.py` |
+| `perplexity-at-home-dashboard` | packaged Streamlit app with workflow switching and thread-aware runs                | optional `dashboard` dependency group          |
+| `langgraph.json`               | LangGraph runtime entrypoints for `quick_search`, `pro_search`, and `deep_research` | also wires the custom store and checkpointer   |
 
 ## Quickstart
 
@@ -161,6 +161,10 @@ Important environment settings:
 
 All settings are loaded through `src/perplexity_at_home/settings.py` with
 Pydantic Settings and nested Postgres configuration.
+
+`langgraph.json` also points the LangGraph runtime at this repository's custom
+store and checkpointer entrypoints in `src/perplexity_at_home/core/store.py`
+and `src/perplexity_at_home/core/checkpoint.py`.
 
 ## Repository Layout
 

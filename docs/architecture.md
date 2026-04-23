@@ -31,6 +31,10 @@ flowchart LR
 When persistence is enabled, the runtime opens both the LangGraph store and
 checkpointer together through `perplexity_at_home.core.persistence`.
 
+The same persistence primitives are also exposed through `langgraph.json` so
+the LangGraph runtime can resolve the repository's custom store and
+checkpointer entrypoints directly.
+
 ## Package layout
 
 - `src/perplexity_at_home/settings.py`: typed app settings and model selection
