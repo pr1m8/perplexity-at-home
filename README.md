@@ -295,8 +295,8 @@ tests/                  # unit, integration, and gated live E2E tests
 The canonical release path is a version tag from `main`:
 
 ```bash
-git tag -a v0.1.0 -m "v0.1.0"
-git push origin v0.1.0
+git tag -a vX.Y.Z -m "vX.Y.Z"
+git push origin vX.Y.Z
 ```
 
 The `Release` workflow then:
