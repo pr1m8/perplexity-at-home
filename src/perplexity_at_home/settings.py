@@ -215,23 +215,23 @@ class AppSettings(BaseSettings):
         """Return the configured deep-research answer model."""
         return self.deep_research_answer_model or self.deep_research_model or self.default_model
 
-    def require_openai_api_key(self) -> SecretStr:
-        """Return the configured OpenAI API key or raise a clear error."""
+    def require_openai_api_key(self) -> str:
+        """Return the configured OpenAI API key value or raise a clear error."""
         if self.openai_api_key is None:
             raise RuntimeError(
                 "OpenAI API key is required. Set OPENAI_API_KEY or "
                 "PERPLEXITY_AT_HOME_OPENAI_API_KEY."
             )
-        return self.openai_api_key
+        return self.openai_api_key.get_secret_value()
 
-    def require_tavily_api_key(self) -> SecretStr:
-        """Return the configured Tavily API key or raise a clear error."""
+    def require_tavily_api_key(self) -> str:
+        """Return the configured Tavily API key value or raise a clear error."""
         if self.tavily_api_key is None:
             raise RuntimeError(
                 "Tavily API key is required. Set TAVILY_API_KEY or "
                 "PERPLEXITY_AT_HOME_TAVILY_API_KEY."
             )
-        return self.tavily_api_key
+        return self.tavily_api_key.get_secret_value()
 
     def apply_runtime_environment(self) -> None:
         """Export runtime-facing environment variables from loaded settings."""

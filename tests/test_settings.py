@@ -75,8 +75,7 @@ def test_build_chat_model_uses_openai_key(monkeypatch) -> None:
     assert result == "chat-model"
     assert captured["model"] == "gpt-5.4"
     assert captured["model_provider"] == "openai"
-    assert settings.openai_api_key is not None
-    assert captured["api_key"] == settings.openai_api_key
+    assert captured["api_key"] == "test-openai-key"
     assert fake_env["OPENAI_API_KEY"] == "test-openai-key"
 
 
