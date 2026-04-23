@@ -3,20 +3,20 @@
 ## Install dependencies
 
 ```bash
-pdm install -G test -G docs
+make setup
 ```
 
-For the optional dashboard:
+You can inspect the common local commands with:
 
 ```bash
-pdm install -G dashboard
+make help
 ```
 
 If you want local durable state, start Postgres with the included infra:
 
 ```bash
-make infra-up
-make infra-setup
+make up
+make db-setup
 ```
 
 ## Configure environment
@@ -36,22 +36,28 @@ LangSmith tracing is optional. If present, `LANGSMITH_API_KEY` and
 In-memory execution:
 
 ```bash
-pdm run perplexity-at-home quick-search "What is Tavily?"
-pdm run perplexity-at-home pro-search "What changed recently in Tavily's LangChain integration?"
-pdm run perplexity-at-home deep-research "What changed recently in Tavily's LangChain integration?"
+make quick QUESTION="What is Tavily?"
+make pro QUESTION="What changed recently in Tavily's LangChain integration?"
+make deep QUESTION="What changed recently in Tavily's LangChain integration?"
 ```
 
 Persistent execution:
 
 ```bash
-pdm run perplexity-at-home deep-research --persistent --setup-persistence "What changed recently in Tavily's LangChain integration?"
+make deep-persistent QUESTION="What changed recently in Tavily's LangChain integration?"
 ```
 
 Dashboard execution:
 
 ```bash
-pdm run perplexity-at-home dashboard
+make dashboard
 ```
+
+Recommended dashboard path:
+
+1. Run `make dashboard` for a quick in-memory smoke test.
+2. Turn persistence on in the sidebar only after `make up` and `make db-setup`.
+3. Start with `quick-search`, then move to `pro-search` or `deep-research`.
 
 ## Validate locally
 

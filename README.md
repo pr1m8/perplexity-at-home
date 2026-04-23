@@ -125,8 +125,13 @@ good enough or the iteration budget is exhausted.
 Install the package dependencies:
 
 ```bash
-pdm install -G test -G docs
-cp .env.example .env
+make setup
+```
+
+See the local command surface at any time with:
+
+```bash
+make help
 ```
 
 Minimal environment:
@@ -138,29 +143,53 @@ Minimal environment:
 Run each lane:
 
 ```bash
-pdm run perplexity-at-home quick-search "What is Tavily?"
-pdm run perplexity-at-home pro-search "What changed recently in Tavily's LangChain integration?"
-pdm run perplexity-at-home deep-research "Compare Tavily, Exa, and Perplexity for agent retrieval."
+make quick QUESTION="What is Tavily?"
+make pro QUESTION="What changed recently in Tavily's LangChain integration?"
+make deep QUESTION="Compare Tavily, Exa, and Perplexity for agent retrieval."
 ```
 
 Turn on durable state:
 
 ```bash
-make infra-up
-make infra-setup
-pdm run perplexity-at-home deep-research --persistent "What is Tavily?"
+make up
+make db-setup
+make deep-persistent QUESTION="What is Tavily?"
 ```
 
 Launch the dashboard:
 
 ```bash
-pdm install -G dashboard
-pdm run perplexity-at-home dashboard
+make dashboard
 ```
 
 The dashboard is built around workflow visibility: research output, sources,
 workflow graph, and run-state inspection. It is state-first today, not a
 token-stream demo surface pretending to be an agent runtime.
+
+## Dashboard Flow
+
+Use this when you want the shortest local path:
+
+```bash
+make setup
+make dashboard
+```
+
+If you want persistent runs in the dashboard:
+
+```bash
+make up
+make db-setup
+make dashboard
+```
+
+Inside the dashboard:
+
+- pick `quick-search` first if you just want to smoke-test the app
+- leave persistence off unless Postgres is already up
+- use `pro-search` or `deep-research` once keys are confirmed working
+- create a new thread when switching question families
+- inspect `Sources`, `Workflow Graph`, and `Run State` after each run
 
 ## Settings, Persistence, and Runtime Surfaces
 

@@ -20,11 +20,13 @@ builder for simpler question-answer flows.
 ## Core commands
 
 ```bash
+make help
 pdm run perplexity-at-home --help
-pdm run perplexity-at-home deep-research "What is Tavily?"
-make infra-up
-make infra-setup
-pdm run perplexity-at-home deep-research --persistent "What is Tavily?"
+make deep QUESTION="What is Tavily?"
+make up
+make db-setup
+make deep-persistent QUESTION="What is Tavily?"
+make dashboard
 make test-e2e
 ```
 
