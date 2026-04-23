@@ -20,7 +20,7 @@ endif
 
 .PHONY: \
 	infra-up infra-down infra-restart infra-logs infra-psql infra-status infra-destroy infra-setup \
-	lint test docs-build docs-serve build release-check
+	lint test docs-build docs-serve build dashboard release-check
 
 infra-up:
 	$(COMPOSE) up -d
@@ -60,5 +60,8 @@ docs-serve:
 
 build:
 	pdm build
+
+dashboard:
+	pdm run perplexity-at-home dashboard
 
 release-check: lint test docs-build build

@@ -1,8 +1,15 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "deep_research": "./src/perplexity_at_home/agents/deep_research/graph.py:build_deep_research_graph",
-    "pro_search": "./src/perplexity_at_home/agents/pro_search/graph.py:build_pro_search_graph"
+    "quick_search": "./src/perplexity_at_home/agents/quick_search/agent.py:build_quick_search_agent",
+    "pro_search": "./src/perplexity_at_home/agents/pro_search/graph.py:build_pro_search_graph",
+    "deep_research": "./src/perplexity_at_home/agents/deep_research/graph.py:build_deep_research_graph"
+  },
+  "store": {
+    "path": "./src/perplexity_at_home/core/store.py:store_context"
+  },
+  "checkpointer": {
+    "path": "./src/perplexity_at_home/core/checkpoint.py:checkpoint_context"
   },
   "env": "./.env"
 }

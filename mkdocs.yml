@@ -61,6 +61,7 @@ nav:
   - Architecture: architecture.md
   - Reference:
       - CLI: reference/cli.md
+      - Dashboard: reference/dashboard.md
       - Settings: reference/settings.md
       - Persistence: reference/persistence.md
       - Deep Research Runtime: reference/deep-research.md

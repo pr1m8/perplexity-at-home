@@ -11,6 +11,10 @@ from perplexity_at_home.agents.quick_search.models import (
     QuickSearchAnswerBase,
     QuickSearchModel,
 )
+from perplexity_at_home.agents.quick_search.runtime import (
+    quick_search_agent_context,
+    run_quick_search,
+)
 from perplexity_at_home.agents.quick_search.state import (
     QuickSearchState,
     QuickSearchStateBase,
@@ -26,4 +30,6 @@ __all__ = [
     "QuickSearchState",
     "QuickSearchStateBase",
     "build_quick_search_agent",
+    "quick_search_agent_context",
+    "run_quick_search",
 ]

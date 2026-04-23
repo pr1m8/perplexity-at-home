@@ -15,6 +15,10 @@ from perplexity_at_home.agents import (
     build_pro_search_agent,
     build_pro_search_graph,
     build_quick_search_agent,
+    pro_search_agent_context,
+    quick_search_agent_context,
+    run_pro_search,
+    run_quick_search,
 )
 from perplexity_at_home.agents.deep_research import (
     deep_research_agent_context,
@@ -37,7 +41,11 @@ __all__ = [
     "build_quick_search_agent",
     "deep_research_agent_context",
     "get_settings",
+    "pro_search_agent_context",
+    "quick_search_agent_context",
     "run_deep_research",
+    "run_pro_search",
+    "run_quick_search",
 ]
 
 try:

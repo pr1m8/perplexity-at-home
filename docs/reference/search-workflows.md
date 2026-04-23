@@ -4,4 +4,8 @@
 
 ::: perplexity_at_home.agents.pro_search.graph
 
+::: perplexity_at_home.agents.pro_search.runtime
+
 ::: perplexity_at_home.agents.quick_search.agent
+
+::: perplexity_at_home.agents.quick_search.runtime
